@@ -1,11 +1,11 @@
 #ifndef __POTION__
 #define __POTION__
 
-#include "Entity/Potions/Accuracy.h"
-#include "Entity/Potions/Experience.h"
-#include "Entity/Potions/Health.h"
-#include "Entity/Potions/Magic.h"
-#include "Entity/Potions/Regeneration.h"
+#include "Entity/Inventory/Potions/Accuracy.h"
+#include "Entity/Inventory/Potions/Experience.h"
+#include "Entity/Inventory/Potions/Health.h"
+#include "Entity/Inventory/Potions/Magic.h"
+#include "Entity/Inventory/Potions/Regeneration.h"
 
 typedef enum {
     ACCURACY, EXPERIENCE, HEALTH, MAGIC, REGENERATION

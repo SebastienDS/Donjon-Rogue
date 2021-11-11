@@ -1,9 +1,9 @@
 #ifndef __EQUIPMENT__
 #define __EQUIPMENT__
 
-#include "Entity/Equipments/Weapon.h"
-#include "Entity/Equipments/Armor.h"
-#include "Entity/Equipments/MagicWand.h"
+#include "Entity/Inventory/Equipments/Weapon.h"
+#include "Entity/Inventory/Equipments/Armor.h"
+#include "Entity/Inventory/Equipments/MagicWand.h"
 
 typedef enum {
     WEAPON, ARMOR, MAGICWAND

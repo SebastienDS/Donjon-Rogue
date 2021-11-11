@@ -10,7 +10,7 @@ ARGS =
 
 CFLAGS = -I ${HEADERS_DIR} -ansi -Wall -Wfatal-errors -g -lMLV
 
-SRC = $(wildcard ${SRC_DIR}/*.c ${SRC_DIR}/*/*.c)
+SRC = $(shell find ${SRC_DIR} -name \*.c)
 OBJ = $(patsubst ${SRC_DIR}/%.c, ${OBJ_DIR}/%.o, ${SRC})
 
 all: create_out ${EXE}

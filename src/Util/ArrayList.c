@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdbool.h>
 #include "Util/ArrayList.h"
 #include "Util/Element.h"
 
@@ -81,4 +82,15 @@ Element arrayList_remove(ArrayList* self, int index) {
 Element arrayList_get(ArrayList* self, int index) {
     assert(index < self->length);
     return self->tab[index];
+}
+
+bool arrayList_contains(ArrayList* self, Element elem){
+    int i;
+
+    for(i = 0; i < self->length; i++){
+        if (self->tab[i] == elem){
+            return true;
+        }
+    }
+    return false;
 }

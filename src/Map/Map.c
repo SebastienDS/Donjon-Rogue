@@ -1,155 +1,165 @@
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "Map/Map.h"
 #include "Util/ArrayList.h"
 #include "Util/random.h"
 
-static int NEIGHBOURS_DIST1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
-static int NEIGHBOURS_DIST2[8][2] = {{0, 2}, {0, -2}, {2, 0}, {-2, 0}, {-1, -1}, {1, 1}, {-1, 1}, {1, -1}};
 
-
-
-void init_map(Map* self){
+void init_map(Map* self) {
     int i, j;
 
-    for (j = 0; j < HEIGHT; j++){
-        for (i = 0; i < WIDTH; i++){
+    for (j = 0; j < HEIGHT; j++) {
+        for (i = 0; i < WIDTH; i++) {
             self->map[j][i].type = WALL;
             self->map[j][i].x = i;
             self->map[j][i].y = j;
         }
     }
-    self->map[j / 2][i / 2].type = STAIR_UP;
+    self->map[HEIGHT / 2][WIDTH / 2].type = ROOM;
 }
 
-static bool distance_1(Map* map, int x, int y){
-    int i, cpt = 0, pos_x, pos_y;
+static int compute_neighbors(Map* map, Cell* cell, int neighbors[][2], int length) {
+    int i, pos_x, pos_y;
+    int cpt = 0;
     
+    for (i = 0; i < length; i++) {
+        pos_x = neighbors[i][0] + cell->x;
+        pos_y = neighbors[i][1] + cell->y;
 
-    for (i = 0; i < 4; i++){
-        int direction[2] = NEIGHBOURS_DIST1[i];
-
-        pos_x = direction[0] + x;
-        pos_y = direction[1] + y;
-        if (map->map[pos_y][pos_x].type == ROOM){
+        if (map->map[pos_y][pos_x].type == ROOM) {
             cpt++;
-        }
+        } 
     }
+
+    return cpt;
+}
+
+static bool is_distance_1_eligible(Map* map, Cell* cell) {
+    static int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+    int cpt = compute_neighbors(map, cell, neighbors_dist1, 4);
     return cpt == 1;
 }
 
-static bool distance_2(Map* map, int x, int y){
-     int i, cpt = 0, pos_x, pos_y;
+static bool is_distance_2_eligible(Map* map, Cell* cell) {
+    static int neighbors_dist2[8][2] = {{0, 2}, {0, -2}, {2, 0}, {-2, 0}, {-1, -1}, {1, 1}, {-1, 1}, {1, -1}};
 
-    for (i = 0; i < 8; i++){
-        int direction[2] = NEIGHBOURS_DIST2[i];
-
-        pos_x = direction[0] + x;
-        pos_y = direction[1] + y;
-        if (map->map[pos_y][pos_x].type == ROOM){
-            cpt++;
-        }
-    }
+    int cpt = compute_neighbors(map, cell, neighbors_dist2, 8);
     return cpt <= 2;
-
 }
 
-bool is_eligible(Map* map, Cell * cell){
+bool is_eligible(Map* map, Cell* cell) {
     return map->map[cell->y][cell->x].type == WALL
-        && distance_1(map, cell->x, cell->y)
-        && distance_2(map, cell->x, cell->y);
+        && is_distance_1_eligible(map, cell)
+        && is_distance_2_eligible(map, cell);
 }
 
-static void init_adjacent(Map* map, ArrayList* list){
+static void init_adjacent(Map* map, ArrayList* list) {
+    static int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
     int i, pos_x, pos_y;
     int x_center = WIDTH / 2;
     int y_center = HEIGHT / 2;
 
-    for(i = 0; i < 4; i++){
-        int direction[2] = NEIGHBOURS_DIST1[i];
-
-        pos_x = direction[0] + x_center;
-        pos_y = direction[1] + y_center;
+    for (i = 0; i < 4; i++) {
+        pos_x = neighbors_dist1[i][0] + x_center;
+        pos_y = neighbors_dist1[i][1] + y_center;
 
         Cell* cell = &(map->map[pos_y][pos_x]);
         arrayList_add(list, cell);
     }
-
 }
 
-bool is_on_the_grid(int x, int y){
-    return x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT;
+bool is_at_the_border(int x, int y) {
+    return x == 0 || y == 0 || x == WIDTH - 1 || y == HEIGHT - 1;
 }
 
-static void fill_adjacent(Map* map, ArrayList* list, Cell* cell){
+static void fill_adjacent(Map* map, ArrayList* list, Cell* cell) {
+    static int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
     int i, pos_x, pos_y;
 
-    for (i = 0; i < 4; i++){
-        int direction[2] = NEIGHBOURS_DIST1[i];
-
-        pos_x = direction[0] + cell->x;
-        pos_y = direction[1] + cell->y;
+    for (i = 0; i < 4; i++) {
+        pos_x = neighbors_dist1[i][0] + cell->x;
+        pos_y = neighbors_dist1[i][1] + cell->y;
         Cell* new_cell = &(map->map[pos_y][pos_x]);
 
-
-        if (is_eligible(map, new_cell) && !is_on_the_grid(pos_x, pos_y) && !arrayList_contains(map, new_cell)){
+        if (is_eligible(map, new_cell) && !is_at_the_border(pos_x, pos_y) 
+            && !arrayList_contains(list, new_cell)) {
             arrayList_add(list, new_cell);
         }
     }
 }
 
-static void fill_wall(Map* map){
-    int i, j, k, l, cpt = 0, pos_x, pos_y;
-    ArrayList* room_to_wall = arrayList_new();
-    
-    for (j = 0; j < HEIGHT; j++){
-        for (i = 0; i < WIDTH; i++){
-            cpt = 0;
-            Cell* cell;
+static void expand_room(Map* map, ArrayList *toexpand) {
+    Cell* cell;
 
-            if (map->map[pos_y][pos_x].type == ROOM){
-                for (k = 0; i < 4; i++){
-                    int direction[2] = NEIGHBOURS_DIST1[i];
-
-                    pos_x = direction[0] + i;
-                    pos_y = direction[1] + j;
-                    cell = &(map->map[pos_y][pos_x]);
-                    if (cell->type == WALL){
-                        cpt++;
-                    }
-                }
+    do {
+        do {
+            if (toexpand->length == 0) {
+                return;
             }
-            if (cpt >= 3){
+
+            int index = randrange(0, toexpand->length - 1);
+            cell = (Cell*) arrayList_remove(toexpand, index);
+        } while (!is_eligible(map, cell));
+
+        cell->type = ROOM;
+        fill_adjacent(map, toexpand, cell);
+    } while (toexpand->length != 0);
+}
+
+/* 
+static bool should_be_wall(Map* map, Cell* cell) {
+    static int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+    int cpt = compute_neighbors(map, cell, neighbors_dist1, 4);
+    return cpt >= 3;
+}
+
+static void get_room_to_be_wall(Map* map, ArrayList* room_to_wall) {
+    int i, j;
+    Cell* cell;
+
+    for (j = 0; j < HEIGHT; j++) {
+        for (i = 0; i < WIDTH; i++) {
+            cell = &map->map[j][i];
+
+            if (cell->type == ROOM && should_be_wall(map, cell)) {
                 arrayList_add(room_to_wall, cell);
             }
         }
     }
-    for (l = 0; l < room_to_wall->length; l++){
-        Cell* cell = (Cell*) arrayList_get(room_to_wall, l);
-
-        cell->type = WALL;
-    }
-    arrayList_free(room_to_wall, NULL);
 }
 
+static void transform_room_to_wall(ArrayList* room_to_wall) {
+    int i;
+    for (i = 0; i < room_to_wall->length; i++){
+        Cell* cell = (Cell*) arrayList_get(room_to_wall, i);
+        cell->type = WALL;
+    }
+}
+
+static void fill_wall(Map* map) {
+    ArrayList* room_to_wall = arrayList_new();
+    
+    get_room_to_be_wall(map, room_to_wall);
+    transform_room_to_wall(room_to_wall);
+
+    arrayList_free(room_to_wall, NULL);
+} 
+*/
 
 void generate_stage(Map* map){
     ArrayList* toexpand = arrayList_new();
+
     init_adjacent(map, toexpand);
-    Cell* cell;
+    expand_room(map, toexpand);
+    /* fill_wall(map); */
 
-    do{
-        do {
-            int index = randrange(0, toexpand->length - 1);
-            cell = (Cell*) arrayList_remove(toexpand, index);
-
-        } while (!is_eligible(map, cell));
-        
-        cell->type = ROOM;
-        fill_adjacent(map, toexpand, cell);
-    } while (toexpand->length != 0);
-    fill_wall(map);
+    map->map[HEIGHT / 2][WIDTH / 2].type = STAIR_UP;
 
     arrayList_free(toexpand, NULL);
 }

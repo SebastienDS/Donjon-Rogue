@@ -1,7 +1,10 @@
 #ifndef __MAP__
 #define __MAP__
+
+#include <stdbool.h>
 #include "Entity/Monster.h"
 #include "Entity/Treasure.h"
+
 #define WIDTH 63
 #define HEIGHT 43
 
@@ -13,14 +16,12 @@ typedef enum {
 
 typedef struct {
     Celltype type;
-    union 
-    {
+    union {
         Monster monster;
         Treasure treasure;
     };
     int x;
     int y;
-    
 } Cell;
 
 typedef struct {
@@ -45,14 +46,14 @@ void init_map(Map* self);
 bool is_eligible(Map* map, Cell* cell);
 
 /**
- * @brief Renvoie si une cellule est sur la carte ou non
+ * @brief Renvoie si une cellule est sur le bord de la map
  * 
  * @param x 
  * @param y 
  * @return true 
  * @return false 
  */
-bool is_on_the_grid(int x, int y);
+bool is_at_the_border(int x, int y);
 
 /**
  * @brief Génère un étage aléatoire 

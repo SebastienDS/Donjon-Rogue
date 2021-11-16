@@ -1,4 +1,4 @@
-.PHONY: all run clean create_out test-leaks test-full-leaks
+.PHONY: all run clean create_out test-leaks test-full-leaks doc
 
 SRC_DIR = src
 HEADERS_DIR = include
@@ -26,6 +26,7 @@ ${OBJ_DIR}/%.o: ${SRC_DIR}/%.c
 
 clean: 
 	@rm -rf ${OUT_DIR}
+	@rm -rf html
 
 create_out:
 	@mkdir -p ${OUT_DIR}
@@ -36,3 +37,6 @@ test-leaks: all
 
 test-full-leaks: all
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${EXE} ${ARGS} 2>${OUT_DIR}/leaks.log
+
+doc:
+	doxygen config/doxygen

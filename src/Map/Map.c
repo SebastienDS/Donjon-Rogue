@@ -20,7 +20,7 @@ void init_map(Map* self) {
     self->map[HEIGHT / 2][WIDTH / 2].type = ROOM;
 }
 
-static int compute_neighbors(Map* map, Cell* cell, int neighbors[][2], int length) {
+static int compute_neighbors(Map* map, Cell* cell, int neighbors[][2], int length, Celltype type) {
     int i, pos_x, pos_y;
     int cpt = 0;
     
@@ -28,7 +28,7 @@ static int compute_neighbors(Map* map, Cell* cell, int neighbors[][2], int lengt
         pos_x = neighbors[i][0] + cell->x;
         pos_y = neighbors[i][1] + cell->y;
 
-        if (map->map[pos_y][pos_x].type == ROOM) {
+        if (map->map[pos_y][pos_x].type == type) {
             cpt++;
         } 
     }
@@ -37,16 +37,16 @@ static int compute_neighbors(Map* map, Cell* cell, int neighbors[][2], int lengt
 }
 
 static bool is_distance_1_eligible(Map* map, Cell* cell) {
-    static int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    static const int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
-    int cpt = compute_neighbors(map, cell, neighbors_dist1, 4);
+    int cpt = compute_neighbors(map, cell, neighbors_dist1, 4, ROOM);
     return cpt == 1;
 }
 
 static bool is_distance_2_eligible(Map* map, Cell* cell) {
-    static int neighbors_dist2[8][2] = {{0, 2}, {0, -2}, {2, 0}, {-2, 0}, {-1, -1}, {1, 1}, {-1, 1}, {1, -1}};
+    static const int neighbors_dist2[8][2] = {{0, 2}, {0, -2}, {2, 0}, {-2, 0}, {-1, -1}, {1, 1}, {-1, 1}, {1, -1}};
 
-    int cpt = compute_neighbors(map, cell, neighbors_dist2, 8);
+    int cpt = compute_neighbors(map, cell, neighbors_dist2, 8, ROOM);
     return cpt <= 2;
 }
 
@@ -57,7 +57,7 @@ bool is_eligible(Map* map, Cell* cell) {
 }
 
 static void init_adjacent(Map* map, ArrayList* list) {
-    static int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    static const int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
     int i, pos_x, pos_y;
     int x_center = WIDTH / 2;
@@ -77,7 +77,7 @@ bool is_at_the_border(int x, int y) {
 }
 
 static void fill_adjacent(Map* map, ArrayList* list, Cell* cell) {
-    static int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    static const int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
     int i, pos_x, pos_y;
 
@@ -111,11 +111,11 @@ static void expand_room(Map* map, ArrayList *toexpand) {
     } while (toexpand->length != 0);
 }
 
-/* 
-static bool should_be_wall(Map* map, Cell* cell) {
-    static int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
-    int cpt = compute_neighbors(map, cell, neighbors_dist1, 4);
+static bool should_be_wall(Map* map, Cell* cell) {
+    static const int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+    int cpt = compute_neighbors(map, cell, neighbors_dist1, 4, WALL);
     return cpt >= 3;
 }
 
@@ -150,17 +150,76 @@ static void fill_wall(Map* map) {
 
     arrayList_free(room_to_wall, NULL);
 } 
-*/
+
+static Cell* select_closest_room(Map* map, Cell* cell){
+    static const int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    ArrayList* list_rooms = arrayList_new();
+    int i, pos_x, pos_y;
+    
+    for (i = 0; i < 4; i++) {
+        pos_x = neighbors_dist1[i][0] + cell->x;
+        pos_y = neighbors_dist1[i][1] + cell->y;
+        Cell* new_cell = &map->map[pos_y][pos_x];
+
+        if (new_cell->type == ROOM) {
+            arrayList_add(list_rooms, new_cell);
+        } 
+    }
+    Cell* rand_cell = arrayList_get(list_rooms, randrange(0, list_rooms->length - 1));
+    arrayList_free(list_rooms, NULL);
+
+    return rand_cell;
+}
+
+static void set_treasure(Cell* cell){
+    cell->type = TREASURE;
+}
+
+
+static void set_monster(Cell* cell){
+    cell->type = MONSTER;
+}
+
+static void set_treasures(Map* map){
+    static const int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    int i, j;
+    
+    for (j = 0; j < HEIGHT; j++) {
+        for (i = 0; i < WIDTH; i++){
+            Cell* cell_treasure = &map->map[j][i];
+
+            if (cell_treasure->type == ROOM) {
+                if (compute_neighbors(map, cell_treasure, neighbors_dist1, 4, ROOM) == 1){
+                    set_treasure(cell_treasure);
+                    Cell* cell_monster = select_closest_room(map, cell_treasure);
+                    set_monster(cell_monster);
+                }
+            } 
+        }
+    }
+}
+
+
+
+static void set_elements(Map* map){
+    Cell* upstair = &map->map[HEIGHT / 2][WIDTH / 2];
+    Cell* treasure = select_closest_room(map, upstair);
+    treasure->type = TREASURE;
+
+    set_treasures(map);
+}
+
 
 void generate_stage(Map* map){
     ArrayList* toexpand = arrayList_new();
 
     init_adjacent(map, toexpand);
     expand_room(map, toexpand);
-    /* fill_wall(map); */
+    fill_wall(map); 
+    arrayList_free(toexpand, NULL);
 
     map->map[HEIGHT / 2][WIDTH / 2].type = STAIR_UP;
 
-    arrayList_free(toexpand, NULL);
+
 }
 

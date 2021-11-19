@@ -2,7 +2,8 @@
 #define __MONSTER__
 
 typedef struct {
-    /* data */
+    int hp;
+    int atk;
 } Monster;
 
 

@@ -20,7 +20,11 @@ void init_map(Map* self) {
     self->map[HEIGHT / 2][WIDTH / 2].type = ROOM;
 }
 
-static int compute_neighbors(Map* map, Cell* cell, int neighbors[][2], int length, Celltype type) {
+static bool is_on_the_grid(int x, int y) {
+    return x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT;
+}
+
+static int compute_neighbors(Map* map, Cell* cell, const int neighbors[][2], int length, Celltype type) {
     int i, pos_x, pos_y;
     int cpt = 0;
     
@@ -28,7 +32,7 @@ static int compute_neighbors(Map* map, Cell* cell, int neighbors[][2], int lengt
         pos_x = neighbors[i][0] + cell->x;
         pos_y = neighbors[i][1] + cell->y;
 
-        if (map->map[pos_y][pos_x].type == type) {
+        if (is_on_the_grid(pos_x, pos_y) && map->map[pos_y][pos_x].type == type) {
             cpt++;
         } 
     }
@@ -151,6 +155,23 @@ static void fill_wall(Map* map) {
     arrayList_free(room_to_wall, NULL);
 } 
 
+static void found_treasures(Map* map, ArrayList* treasures) {
+    static const int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    int i, j;
+
+    for (j = 0; j < HEIGHT; j++) {
+        for (i = 0; i < WIDTH; i++){
+            Cell* cell_treasure = &map->map[j][i];
+
+            if (cell_treasure->type == ROOM) {
+                if (compute_neighbors(map, cell_treasure, neighbors_dist1, 4, ROOM) == 1){
+                    arrayList_add(treasures, cell_treasure);
+                }
+            } 
+        }
+    }
+}
+
 static Cell* select_closest_room(Map* map, Cell* cell){
     static const int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
     ArrayList* list_rooms = arrayList_new();
@@ -165,10 +186,21 @@ static Cell* select_closest_room(Map* map, Cell* cell){
             arrayList_add(list_rooms, new_cell);
         } 
     }
-    Cell* rand_cell = arrayList_get(list_rooms, randrange(0, list_rooms->length - 1));
+
+    Cell* closest_cell = NULL;
+
+    /* 
+        Prend en compte le cas ou il y a plusieurs coffres adjacent relié par 1 ROOM (qui devriendra MONSTER)
+        On decide de garder ici seulement 1 coffre pour ne pas surcharger le monstre
+    */
+    if (list_rooms->length > 0) {
+        int rand_index = randrange(0, list_rooms->length - 1);
+        closest_cell = arrayList_get(list_rooms, rand_index);
+    }
+
     arrayList_free(list_rooms, NULL);
 
-    return rand_cell;
+    return closest_cell;
 }
 
 static void set_treasure(Cell* cell){
@@ -181,25 +213,25 @@ static void set_monster(Cell* cell){
 }
 
 static void set_treasures(Map* map){
-    static const int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
-    int i, j;
+    int i;
+    ArrayList* treasures = arrayList_new();
     
-    for (j = 0; j < HEIGHT; j++) {
-        for (i = 0; i < WIDTH; i++){
-            Cell* cell_treasure = &map->map[j][i];
+    found_treasures(map, treasures);
 
-            if (cell_treasure->type == ROOM) {
-                if (compute_neighbors(map, cell_treasure, neighbors_dist1, 4, ROOM) == 1){
-                    set_treasure(cell_treasure);
-                    Cell* cell_monster = select_closest_room(map, cell_treasure);
-                    set_monster(cell_monster);
-                }
-            } 
+    for (i = 0; i < treasures->length; i++) {
+        Cell* cell_treasure = arrayList_get(treasures, i);
+        Cell* cell_monster = select_closest_room(map, cell_treasure);
+
+        if (cell_monster == NULL) {
+            continue;
         }
+        
+        set_treasure(cell_treasure);
+        set_monster(cell_monster);
     }
+
+    arrayList_free(treasures, NULL);
 }
-
-
 
 static void set_elements(Map* map){
     Cell* upstair = &map->map[HEIGHT / 2][WIDTH / 2];
@@ -220,6 +252,6 @@ void generate_stage(Map* map){
 
     map->map[HEIGHT / 2][WIDTH / 2].type = STAIR_UP;
 
-
+    set_elements(map);
 }
 

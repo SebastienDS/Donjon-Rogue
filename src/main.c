@@ -24,11 +24,17 @@ void print_map(Map* map) {
     for (j = 0; j < HEIGHT; j++) {
         for (i = 0; i < WIDTH; i++) {
             if (map->map[j][i].type == WALL) {
-                printf(" ");
+                printf("w");
             } else if (map->map[j][i].type == STAIR_UP) {
-                printf("x");
+                printf("u");
+            } else if (map->map[j][i].type == STAIR_DOWN) {
+                printf("d");
+            } else if (map->map[j][i].type == MONSTER) {
+                printf("m");
+            } else if (map->map[j][i].type == TREASURE) {
+                printf("c");
             } else {
-                printf("o");
+                printf(" ");
             }
         }
         printf("\n");

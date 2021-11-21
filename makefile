@@ -39,4 +39,4 @@ test-full-leaks: all
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${EXE} ${ARGS} 2>${OUT_DIR}/leaks.log
 
 doc:
-	doxygen config/doxygen
+	doxygen .config/doxygen

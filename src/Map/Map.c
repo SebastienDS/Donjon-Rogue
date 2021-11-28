@@ -260,3 +260,24 @@ void generate_stage(Map* map){
 
 }
 
+static bool can_move(Map* map, Player* player, int dx, int dy) {
+    int x = player->pos.x + dx;
+    int y = player->pos.y + dy;
+
+    if (!is_on_the_grid(x, y)) return false;
+
+    Cell* cell = get_cell(map, x, y);
+    return cell->type != WALL && cell->type != TREASURE && cell->type != MONSTER;
+}
+
+static void move(Map* map, Player* player, int dx, int dy) {
+    player->pos.x += dx;
+    player->pos.y += dy;
+}
+
+bool try_move(Map* map, Player* player, int dx, int dy) {
+    if (!can_move(map, player, dx, dy)) return false;
+
+    move(map, player, dx, dy);
+    return true;
+}

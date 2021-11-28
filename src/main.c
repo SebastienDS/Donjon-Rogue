@@ -2,41 +2,37 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "Core/core.h"
+#include "Core/GameStates.h"
+#include "Core/Events.h"
 #include "Map/Map.h"
+#include "constants.h"
 
-void print_map(Map* map);
 
-int main() {
+int main(void) {
     srand(time(NULL));
 
-    Map map;
-    init_map(&map);
-    generate_stage(&map);
+    GameStates gs;
+    Events events;
 
-    print_map(&map);
+    MLV_create_window("Donjon Rogue", "donjon-rogue", SCREEN_WIDTH, SCREEN_HEIGHT);
+
+
+    init(&gs);
+
+    MLV_change_frame_rate(60);
+
+    while (true) {
+        events.event = MLV_get_event(&events.key, NULL, NULL, NULL, NULL, &events.mouseX, &events.mouseY, NULL, &events.state);
+
+        update(&gs, &events);
+        draw(&gs);
+        MLV_actualise_window();
+
+        MLV_delay_according_to_frame_rate();
+    }
+
+    MLV_free_window();
 
     return 0;
-}
-
-void print_map(Map* map) {
-    int i, j;
-
-    for (j = 0; j < HEIGHT; j++) {
-        for (i = 0; i < WIDTH; i++) {
-            if (map->map[j][i].type == WALL) {
-                printf("w");
-            } else if (map->map[j][i].type == STAIR_UP) {
-                printf("u");
-            } else if (map->map[j][i].type == STAIR_DOWN) {
-                printf("d");
-            } else if (map->map[j][i].type == MONSTER) {
-                printf("m");
-            } else if (map->map[j][i].type == TREASURE) {
-                printf("c");
-            } else {
-                printf(" ");
-            }
-        }
-        printf("\n");
-    }
 }

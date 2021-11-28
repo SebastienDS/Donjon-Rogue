@@ -12,6 +12,8 @@ CFLAGS = -I ${HEADERS_DIR} -ansi -Wall -Wfatal-errors -g -lMLV
 
 SRC = $(shell find ${SRC_DIR} -name \*.c)
 OBJ = $(patsubst ${SRC_DIR}/%.c, ${OBJ_DIR}/%.o, ${SRC})
+INC = $(shell find ${HEADERS_DIR} -name \*.h)
+
 
 all: create_out ${EXE}
 
@@ -21,7 +23,7 @@ run: all
 ${EXE}: ${OBJ}
 	gcc $^ -o $@ ${CFLAGS}
 
-${OBJ_DIR}/%.o: ${SRC_DIR}/%.c
+${OBJ_DIR}/%.o: ${SRC_DIR}/%.c ${INC}
 	gcc -c $< -o $@ ${CFLAGS}
 
 clean: 

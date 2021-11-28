@@ -4,11 +4,7 @@
 #include <stdbool.h>
 #include "Entity/Monster.h"
 #include "Entity/Treasure.h"
-
-#define WIDTH 63
-#define HEIGHT 43
-
-
+#include "constants.h"
 
 typedef enum {
     WALL, ROOM, MONSTER, TREASURE, STAIR_UP, STAIR_DOWN
@@ -29,6 +25,16 @@ typedef struct {
 } Map;
 
 /**
+ * @brief Renvoie la cellule à la position (x, y)
+ * 
+ * @param map 
+ * @param x 
+ * @param y 
+ * @return Cell* 
+ */
+Cell* get_cell(Map* map, int x, int y);
+
+/**
  * @brief Initialise la carte avec des murs et un escalier montant au centre
  * 
  * @param self map à initialiser
@@ -36,14 +42,14 @@ typedef struct {
 void init_map(Map* self);
 
 /**
- * @brief Test l'éligibilité de la case à devenir une case "ROOM"
+ * @brief Renvoie si une cellule est sur la grille
  * 
- * @param map 
- * @param cell
+ * @param x 
+ * @param y 
  * @return true 
  * @return false 
  */
-bool is_eligible(Map* map, Cell* cell);
+bool is_on_the_grid(int x, int y);
 
 /**
  * @brief Renvoie si une cellule est sur le bord de la map

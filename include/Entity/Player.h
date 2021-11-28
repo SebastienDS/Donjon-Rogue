@@ -17,6 +17,11 @@ typedef struct {
 } Bonus;
 
 typedef struct {
+    int x;
+    int y;
+} Position;
+
+typedef struct {
     int hp;
     int mp;
     int atk;
@@ -27,6 +32,14 @@ typedef struct {
     int crit;
     Inventory inventory;
     Bonus bonus;
+    Position pos;
 } Player;
+
+/**
+ * @brief Initialise le joueur
+ * 
+ * @param self 
+ */
+void init_player(Player* self, int x, int y);
 
 #endif

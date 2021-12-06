@@ -16,9 +16,13 @@ static MLV_Image* load_image(const char* filename, int width, int height) {
 }
 
 void init_images(Images* img) {
-    img->treasure = load_image("resources/images/treasure/chest_full_open_anim_f0.png", CELL_SIZE, CELL_SIZE);
+    img->treasure.close = load_image("resources/images/treasure/chest_full_open_anim_f0.png", CELL_SIZE, CELL_SIZE);
+    img->treasure.open = load_image("resources/images/treasure/chest_full_open_anim_f2.png", CELL_SIZE, CELL_SIZE);    
 }
 
+
+
 void free_images(Images* img) {
-    MLV_free_image(img->treasure);
+    MLV_free_image(img->treasure.open);
+    MLV_free_image(img->treasure.close);
 }

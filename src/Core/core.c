@@ -1,6 +1,7 @@
 #include "Core/core.h"
 #include "Core/GameStates.h"
 #include "Core/Events.h"
+#include "Core/Action.h"
 #include "Entity/Player.h"
 #include "Map/Map.h"
 #include "Interface/graphics.h"
@@ -40,8 +41,8 @@ static bool update_player_movement(GameStates* gs, Events* events) {
     return try_move(map, player, dx, dy);
 }
 
-static bool update_player_action(GameStates* gs, Events* events) {
-    if (!(events->event == MLV_KEY && events->state == MLV_PRESSED)) return false;
+static void update_player_action(GameStates* gs, Events* events, Action* action) {
+    if (!(events->event == MLV_KEY && events->state == MLV_PRESSED)) return;
 
     Player* player = &gs->player;
     Map* map = &gs->map;
@@ -69,18 +70,19 @@ static bool update_player_action(GameStates* gs, Events* events) {
             break;
     }
 
-    if (cell == NULL) return false;
+
+    if (cell == NULL) return;
 
     if (cell->type == TREASURE) {
+        action->type = OPEN_TREASURE;
+        action->cell = cell;
         fprintf(stderr, "TREASURE");
     }
     else if (cell->type == MONSTER) {
+        action->type = FIGHT_MONSTER;
+        action->cell = cell;
         fprintf(stderr, "MONSTER");
     }
-    else {
-        return false;
-    }
-    return true;
 }
 
 void init(GameStates* gs) {
@@ -91,7 +93,15 @@ void init(GameStates* gs) {
 }
 
 void update(GameStates* gs, Events* events) {
-    bool player_updated = update_player_movement(gs, events) || update_player_action(gs, events);
+    bool player_updated = update_player_movement(gs, events);
+
+    if (player_updated){
+        return;
+    } 
+    Action* action = action_new();
+    update_player_action(gs, events, action);
+    apply_action(action, gs);
+    action_free(action);
 }
 
 void draw(GameStates* gs, Images* images) {

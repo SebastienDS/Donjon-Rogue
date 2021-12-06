@@ -210,6 +210,7 @@ static Cell* select_closest_room(Map* map, Cell* cell){
 
 static void set_treasure(Cell* cell){
     cell->type = TREASURE;
+    cell->treasure.state = CLOSE;
 }
 
 
@@ -243,7 +244,7 @@ static void set_elements(Map* map){
 
     Cell* upstair = get_cell(map, START_X, START_Y);
     Cell* treasure = select_closest_room(map, upstair);
-    treasure->type = TREASURE;
+    set_treasure(treasure);
 }
 
 
@@ -257,7 +258,6 @@ void generate_stage(Map* map){
 
     set_elements(map);
     get_cell(map, START_X, START_Y)->type = STAIR_UP;
-
 }
 
 static bool can_move(Map* map, Player* player, int dx, int dy) {

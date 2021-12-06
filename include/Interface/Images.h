@@ -4,7 +4,13 @@
 #include <MLV/MLV_all.h>
 
 typedef struct {
-    MLV_Image* treasure;
+    MLV_Image* open;
+    MLV_Image* close;
+} Treasure_img;
+
+
+typedef struct {
+    Treasure_img treasure;
 } Images;
 
 

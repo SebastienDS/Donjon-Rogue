@@ -5,6 +5,7 @@
 #include "Map/Map.h"
 #include "Interface/graphics.h"
 #include "Interface/interface.h"
+#include "Interface/Images.h"
 
 
 static bool update_player_movement(GameStates* gs, Events* events) {
@@ -93,9 +94,9 @@ void update(GameStates* gs, Events* events) {
     bool player_updated = update_player_movement(gs, events) || update_player_action(gs, events);
 }
 
-void draw(GameStates* gs) {
+void draw(GameStates* gs, Images* images) {
     MLV_clear_window(MLV_COLOR_BLACK);
     
-    draw_graphics(gs);
+    draw_graphics(gs, images);
     draw_interface(gs);
 }

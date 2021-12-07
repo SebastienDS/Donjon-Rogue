@@ -42,7 +42,9 @@ static void draw_map(Map* map, Player* player, Images* images) {
                 }
             } 
             else if (cell->type == MONSTER) {
-                MLV_draw_filled_rectangle(x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y, CELL_SIZE, CELL_SIZE, MLV_COLOR_RED);
+                MLV_draw_filled_rectangle(x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y, CELL_SIZE, CELL_SIZE, MLV_COLOR_WHITE);
+                MLV_draw_image(images->zombie, x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y);
+
             } 
             else if (cell->type == ROOM){
                 MLV_draw_filled_rectangle(x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y, CELL_SIZE, CELL_SIZE, MLV_COLOR_WHITE);

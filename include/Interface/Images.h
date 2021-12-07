@@ -11,6 +11,7 @@ typedef struct {
 
 typedef struct {
     Treasure_img treasure;
+    MLV_Image* zombie;
 } Images;
 
 

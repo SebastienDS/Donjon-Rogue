@@ -3,8 +3,12 @@
 
 #include "Entity/Inventory/Potions/Potion.h"
 #include "Entity/Inventory/Inventory.h"
+#include "Entity/Monster.h"
 
 #define NB_POTIONS 3
+#define REGENERATION 0
+#define ACCURACY 1
+#define EXPERIENCE 2
 
 /* 
     [0] -> regeneration 
@@ -41,5 +45,36 @@ typedef struct {
  * @param self 
  */
 void init_player(Player* self, int x, int y);
+
+/**
+ * @brief Initialise les hp du player
+ * 
+ * @param self 
+ */
+void init_hp_player(Player* self);
+
+/**
+ * @brief Initialise les mp du player
+ * 
+ * @param self 
+ */
+void init_mp_player(Player* self);
+
+/**
+ * @brief Effectue une attaque physique
+ * 
+ * @param self 
+ * @param monster 
+ */
+void physical_attack(Player* self, Monster* monster);
+
+/**
+ * @brief Effectue une attaque magique
+ * 
+ * @param self 
+ * @param monster 
+ */
+void magical_attack(Player* self, Monster* monster);
+
 
 #endif

@@ -6,6 +6,8 @@
 #include "Util/ArrayList.h"
 #include "Util/random.h"
 #include "constants.h"
+#include "Entity/Monster.h"
+#include "Entity/Treasure.h"
 
 
 Cell* get_cell(Map* map, int x, int y) {
@@ -211,11 +213,13 @@ static Cell* select_closest_room(Map* map, Cell* cell){
 static void set_treasure(Cell* cell){
     cell->type = TREASURE;
     cell->treasure.state = CLOSE;
+    init_treasure(&cell->treasure);
 }
 
 
 static void set_monster(Cell* cell){
     cell->type = MONSTER;
+    init_monster(&cell->monster);
 }
 
 static void set_treasures(Map* map){

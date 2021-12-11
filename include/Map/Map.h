@@ -36,6 +36,20 @@ typedef struct {
 Cell* get_cell(Map* map, int x, int y);
 
 /**
+ * @brief Crée et génere une map aléatoire
+ * 
+ * @return Map* 
+ */
+Map* map_new();
+
+/**
+ * @brief Libère la mémoire d'une map
+ * 
+ * @param map 
+ */
+void map_free(Map* map);
+
+/**
  * @brief Initialise la carte avec des murs et un escalier montant au centre
  * 
  * @param self map à initialiser

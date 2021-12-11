@@ -14,6 +14,23 @@ Cell* get_cell(Map* map, int x, int y) {
     return &map->map[y][x];
 }
 
+Map* map_new() {
+    Map* map = (Map*)malloc(sizeof(Map));
+    if (map == NULL) {
+        fprintf(stderr, "Map malloc error\n");
+        exit(1);
+    }
+
+    init_map(map);
+    generate_stage(map);
+
+    return map;
+}
+
+void map_free(Map* map) {
+    free(map);
+}
+
 void init_map(Map* self) {
     int i, j;
 
@@ -251,6 +268,35 @@ static void set_elements(Map* map){
     set_treasure(treasure);
 }
 
+static int manhattan_distance(int i1, int j1, int i2, int j2) {
+    return abs(i1 - i2) + abs(j1 - j2);
+}
+
+static void set_stair_down(Map* map, Cell* stair_up) {
+    ArrayList* list = arrayList_new();
+
+    int i, j;
+    for (j = 0; j < HEIGHT; j++) {
+        for (i = 0; i < WIDTH; i++) {
+            Cell* cell = get_cell(map, i, j);
+
+            if (cell->type != ROOM) continue;
+
+            if (manhattan_distance(i, j, stair_up->x, stair_up->y)) { /* TODO: distance >= xxxx */
+                arrayList_add(list, cell);
+            }
+        }
+    }
+
+    int index = randrange(0, list->length - 1);
+    Cell* stair_down = (Cell*)arrayList_get(list, index);
+
+    stair_down->type = STAIR_DOWN;
+    printf("%d %d\n", stair_down->x, stair_down->y);
+
+    arrayList_free(list, NULL);
+}
+
 
 void generate_stage(Map* map){
     ArrayList* toexpand = arrayList_new();
@@ -261,7 +307,10 @@ void generate_stage(Map* map){
     arrayList_free(toexpand, NULL);
 
     set_elements(map);
-    get_cell(map, START_X, START_Y)->type = STAIR_UP;
+    Cell* cell = get_cell(map, START_X, START_Y);
+    cell->type = STAIR_UP;
+
+    set_stair_down(map, cell);
 }
 
 static bool can_move(Map* map, Player* player, int dx, int dy) {
@@ -271,7 +320,7 @@ static bool can_move(Map* map, Player* player, int dx, int dy) {
     if (!is_on_the_grid(x, y)) return false;
 
     Cell* cell = get_cell(map, x, y);
-    return cell->type != WALL && cell->type != TREASURE && cell->type != MONSTER;
+    return cell->type == ROOM || (cell->type == TREASURE && cell->treasure.state == OPEN) || cell->type == STAIR_DOWN || cell->type == STAIR_UP;
 }
 
 static void move(Map* map, Player* player, int dx, int dy) {

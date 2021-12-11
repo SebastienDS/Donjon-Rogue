@@ -5,7 +5,7 @@
 #include "Core/GameStates.h"
 
 typedef enum {
-    NONE, OPEN_TREASURE, FIGHT_MONSTER, OPEN_INVENTORY
+    NONE, OPEN_TREASURE, FIGHT_MONSTER, OPEN_INVENTORY, USE_STAIR
 } ActionType;
 
 typedef struct {

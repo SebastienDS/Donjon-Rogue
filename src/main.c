@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 
 #include "Core/core.h"
@@ -11,7 +12,8 @@
 
 
 int main(void) {
-    srand(time(NULL));
+    /* srand(time(NULL)); */
+    srand(2);
 
     GameStates gs;
     Events events;
@@ -21,7 +23,7 @@ int main(void) {
 
 
     init_images(&images);
-    init(&gs);
+    init_game_states(&gs);
 
     MLV_change_frame_rate(60);
 
@@ -36,6 +38,8 @@ int main(void) {
     }
 
     free_images(&images);
+    destroy_game_states(&gs);
+
     MLV_free_window();
 
     return 0;

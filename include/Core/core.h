@@ -7,13 +7,6 @@
 
 
 /**
- * @brief Initialise les variables du jeu
- * 
- * @param gs 
- */
-void init(GameStates* gs);
-
-/**
  * @brief Update les variables du jeu
  * 
  * @param gs 

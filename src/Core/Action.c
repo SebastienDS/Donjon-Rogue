@@ -1,6 +1,7 @@
 #include "Core/Action.h"
 #include "Core/GameStates.h"
 #include "Entity/Monster.h"
+#include "Map/Map.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,16 +24,27 @@ static void remove_if_dead(Cell* cell){
     }
 }
 
-void apply_action(Action* action, GameStates* gs){
+void apply_action(Action* action, GameStates* gs) {
+    Cell* cell;
+
     switch (action->type) {
         case OPEN_TREASURE:
             action->cell->treasure.state = OPEN;
             break;
         
         case FIGHT_MONSTER:
-            physical_attack(&gs->player, &action->cell->monster);
+            physical_attack(get_player(gs), &action->cell->monster);
             printf("hp : %d \n", action->cell->monster.hp);
             remove_if_dead(action->cell);
+            break;
+        case USE_STAIR:
+            cell = action->cell;
+            
+            if (cell->type == STAIR_DOWN) {
+                go_next_stage(gs);
+            } else if (cell->type == STAIR_UP) {
+                go_previous_stage(gs);
+            }
             break;
         default:
             break;

@@ -12,6 +12,10 @@ typedef struct {
 typedef struct {
     Treasure_img treasure;
     MLV_Image* zombie;
+    MLV_Image* player;
+    MLV_Image* stair;
+    MLV_Image* floor;
+    MLV_Image* wall;
 } Images;
 
 

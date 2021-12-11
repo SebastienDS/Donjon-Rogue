@@ -31,9 +31,11 @@ static void draw_map(Map* map, Player* player, Images* images) {
 
             if (cell->type == WALL) {
                 MLV_draw_filled_rectangle(x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y, CELL_SIZE, CELL_SIZE, MLV_COLOR_BLACK);
+                /* MLV_draw_image(images->room, x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y); */
             } 
             else if (cell->type == TREASURE) {
-                MLV_draw_filled_rectangle(x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y, CELL_SIZE, CELL_SIZE, MLV_COLOR_WHITE);
+                MLV_draw_image(images->floor, x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y);
+
                 if (cell->treasure.state == CLOSE) {
                     MLV_draw_image(images->treasure.close, x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y);
                 }
@@ -42,12 +44,15 @@ static void draw_map(Map* map, Player* player, Images* images) {
                 }
             } 
             else if (cell->type == MONSTER) {
-                MLV_draw_filled_rectangle(x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y, CELL_SIZE, CELL_SIZE, MLV_COLOR_WHITE);
+                MLV_draw_image(images->floor, x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y);
                 MLV_draw_image(images->zombie, x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y);
 
             } 
             else if (cell->type == ROOM){
-                MLV_draw_filled_rectangle(x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y, CELL_SIZE, CELL_SIZE, MLV_COLOR_WHITE);
+                MLV_draw_image(images->floor, x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y);
+            }
+            else if (cell->type == STAIR_UP || cell->type == STAIR_DOWN) {
+                MLV_draw_image(images->stair, x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y);
             }
             else {
                 MLV_draw_filled_rectangle(x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y, CELL_SIZE, CELL_SIZE, MLV_COLOR_DEEP_PINK);
@@ -56,11 +61,11 @@ static void draw_map(Map* map, Player* player, Images* images) {
     }
 }
 
-static void draw_player(Player* player) {
-    MLV_draw_filled_rectangle((SCREEN_WIDTH - CELL_SIZE) / 2, (SCREEN_HEIGHT - CELL_SIZE) / 2, CELL_SIZE, CELL_SIZE, MLV_COLOR_BLUE);
+static void draw_player(Player* player, Images* images) {
+    MLV_draw_image(images->player, (SCREEN_WIDTH - CELL_SIZE) / 2, (SCREEN_HEIGHT - CELL_SIZE) / 2);
 }
 
 void draw_graphics(GameStates* gs, Images* images) {
-    draw_map(&gs->map, &gs->player, images);
-    draw_player(&gs->player);
+    draw_map(get_current_map(gs), get_player(gs), images);
+    draw_player(get_player(gs), images);
 }

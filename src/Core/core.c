@@ -12,8 +12,8 @@
 static bool update_player_movement(GameStates* gs, Events* events) {
     if (!(events->event == MLV_KEY && events->state == MLV_PRESSED)) return false;
 
-    Player* player = &gs->player;
-    Map* map = &gs->map;
+    Player* player = get_player(gs);
+    Map* map = get_current_map(gs);
     
     int dx = 0, dy = 0;
 
@@ -41,11 +41,11 @@ static bool update_player_movement(GameStates* gs, Events* events) {
     return try_move(map, player, dx, dy);
 }
 
-static void update_player_action(GameStates* gs, Events* events, Action* action) {
-    if (!(events->event == MLV_KEY && events->state == MLV_PRESSED)) return;
+static bool update_action_from_player_movement(GameStates* gs, Events* events, Action* action) {
+    if (!(events->event == MLV_KEY && events->state == MLV_PRESSED)) return false;
 
-    Player* player = &gs->player;
-    Map* map = &gs->map;
+    Player* player = get_player(gs);
+    Map* map = get_current_map(gs);
 
     Cell* cell = NULL;
     
@@ -71,35 +71,51 @@ static void update_player_action(GameStates* gs, Events* events, Action* action)
     }
 
 
-    if (cell == NULL) return;
+    if (cell == NULL) return false;
 
-    if (cell->type == TREASURE) {
+    if (cell->type == TREASURE && cell->treasure.state == CLOSE) {
         action->type = OPEN_TREASURE;
         action->cell = cell;
         fprintf(stderr, "TREASURE");
+        return true;
     }
     else if (cell->type == MONSTER) {
         action->type = FIGHT_MONSTER;
         action->cell = cell;
         fprintf(stderr, "MONSTER");
+        return true;
     }
+    return false;
 }
 
-void init(GameStates* gs) {
-    init_map(&gs->map);
-    generate_stage(&gs->map);
+static bool update_action_from_input(GameStates* gs, Events* events, Action* action) {
+    if (!(events->event == MLV_KEY && events->state == MLV_PRESSED)) return false;
 
-    init_player(&gs->player, START_X, START_Y);
+    Player* player = get_player(gs);
+    Map* map = get_current_map(gs);
+
+    Cell* cell;
+
+    switch (events->key) {
+        case MLV_KEYBOARD_e:
+            cell = get_cell(map, player->pos.x, player->pos.y);
+            action->type = USE_STAIR;
+            action->cell = cell;
+            return true;
+        default:
+            break;
+    }
+
+    return false;
 }
 
 void update(GameStates* gs, Events* events) {
-    bool player_updated = update_player_movement(gs, events);
-
-    if (player_updated){
-        return;
-    } 
     Action* action = action_new();
-    update_player_action(gs, events, action);
+
+    update_action_from_input(gs, events, action)
+        || update_action_from_player_movement(gs, events, action)
+        || update_player_movement(gs, events);
+
     apply_action(action, gs);
     action_free(action);
 }

@@ -7,6 +7,7 @@
 #include "Interface/graphics.h"
 #include "Interface/interface.h"
 #include "Interface/Images.h"
+#include <MLV/MLV_all.h>
 
 
 static bool update_player_movement(GameStates* gs, Events* events) {
@@ -120,9 +121,10 @@ void update(GameStates* gs, Events* events) {
     action_free(action);
 }
 
-void draw(GameStates* gs, Images* images) {
+void draw(GameStates* gs, Images* images, MLV_Font* font) {
     MLV_clear_window(MLV_COLOR_BLACK);
     
     draw_graphics(gs, images);
-    draw_interface(gs);
+    draw_interface(gs, font);
 }
+

@@ -18,16 +18,16 @@ void init_player(Player* self, int x, int y) {
     self->crit = 5;
     self->lvl = 1;
     self->exp = 0;
-    init_hp_player(self); 
-    init_mp_player(self);
+    self->hp = get_hp_player(self); 
+    self->mp = get_mp_player(self);
 }
 
-void init_hp_player(Player* self){
-    self->hp = 10 * self->def;
+int get_hp_player(Player* self){
+    return 10 * self->def;
 }
 
-void init_mp_player(Player* self){
-    self->mp = 10 * self->intel - 50;
+int get_mp_player(Player* self){
+    return 10 * self->intel - 50;
 }
 
 static int get_crit(Player* self){

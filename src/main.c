@@ -9,6 +9,8 @@
 #include "Map/Map.h"
 #include "Interface/Images.h"
 #include "constants.h"
+#include <MLV/MLV_all.h>
+
 
 
 int main(void) {
@@ -21,7 +23,7 @@ int main(void) {
 
     MLV_create_window("Donjon Rogue", "donjon-rogue", SCREEN_WIDTH, SCREEN_HEIGHT);
 
-
+    MLV_Font* font = MLV_load_font("resources/font/neon_pixel-7.ttf", 50);
     init_images(&images);
     init_game_states(&gs);
 
@@ -31,7 +33,7 @@ int main(void) {
         events.event = MLV_get_event(&events.key, NULL, NULL, NULL, NULL, &events.mouseX, &events.mouseY, NULL, &events.state);
 
         update(&gs, &events);
-        draw(&gs, &images);
+        draw(&gs, &images, font);
         MLV_actualise_window();
 
         MLV_delay_according_to_frame_rate();
@@ -40,6 +42,7 @@ int main(void) {
     free_images(&images);
     destroy_game_states(&gs);
 
+    MLV_free_font(font);
     MLV_free_window();
 
     return 0;

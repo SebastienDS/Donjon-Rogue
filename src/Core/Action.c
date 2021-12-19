@@ -54,3 +54,5 @@ void apply_action(Action* action, GameStates* gs) {
 void action_free(Action* action){
     free(action);
 }
+
+

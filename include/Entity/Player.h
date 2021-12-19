@@ -47,18 +47,20 @@ typedef struct {
 void init_player(Player* self, int x, int y);
 
 /**
- * @brief Initialise les hp du player
+ * @brief Renvoie les hp max du player
  * 
  * @param self 
+ * @return int
  */
-void init_hp_player(Player* self);
+int get_hp_player(Player* self);
 
 /**
- * @brief Initialise les mp du player
+ * @brief Renvoie les mp max du player
  * 
  * @param self 
+ * @return int
  */
-void init_mp_player(Player* self);
+int get_mp_player(Player* self);
 
 /**
  * @brief Effectue une attaque physique

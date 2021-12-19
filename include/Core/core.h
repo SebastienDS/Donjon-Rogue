@@ -4,6 +4,8 @@
 #include "Core/GameStates.h"
 #include "Core/Events.h"
 #include "Interface/Images.h"
+#include <MLV/MLV_all.h>
+
 
 
 /**
@@ -19,7 +21,8 @@ void update(GameStates* gs, Events* events);
  * 
  * @param gs
  * @param images
+ * @param font
  */
-void draw(GameStates* gs, Images* images);
+void draw(GameStates* gs, Images* images, MLV_Font* font);
 
 #endif

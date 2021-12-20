@@ -8,7 +8,7 @@ OBJ_DIR = ${OUT_DIR}/obj
 EXE = ${OUT_DIR}/main
 ARGS = 
 
-CFLAGS = -I ${HEADERS_DIR} -ansi -Wall -Wfatal-errors -g -lMLV
+CFLAGS = -I ${HEADERS_DIR} -ansi -Wall -Wfatal-errors -g -lMLV -lm
 
 SRC = $(shell find ${SRC_DIR} -name \*.c)
 OBJ = $(patsubst ${SRC_DIR}/%.c, ${OBJ_DIR}/%.o, ${SRC})

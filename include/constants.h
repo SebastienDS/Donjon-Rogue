@@ -15,4 +15,6 @@
 #define SCREEN_WIDTH VISION_X * CELL_SIZE
 #define SCREEN_HEIGHT VISION_Y * CELL_SIZE
 
+#define DEBUG 1
+
 #endif

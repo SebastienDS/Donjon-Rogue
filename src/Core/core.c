@@ -39,7 +39,12 @@ static bool update_player_movement(GameStates* gs, Events* events) {
             break;
     }
 
-    return try_move(map, player, dx, dy);
+    bool moved = try_move(map, player, dx, dy);
+
+    #if DEBUG
+        if (moved) update_path_to_stair(gs);
+    #endif
+    return moved;
 }
 
 static bool update_action_from_player_movement(GameStates* gs, Events* events, Action* action) {

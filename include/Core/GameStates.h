@@ -2,6 +2,7 @@
 #define __GAMESTATES__
 
 #include "Util/ArrayList.h"
+#include "Util/LinkedList.h"
 #include "Map/Map.h"
 #include "Entity/Player.h"
 
@@ -9,6 +10,7 @@ typedef struct {
     ArrayList* maps; /* ArrayList<Map> */
     int current_stage;
     Player player;
+    LinkedList* path_to_stair; /* LinkedList<Position> */
 } GameStates;
 
 /**
@@ -18,7 +20,7 @@ typedef struct {
  */
 void init_game_states(GameStates* gs);
 
-/**
+/** 
  * @brief Libère la mémoire allouée par les variables du jeu
  * 
  * @param gs 
@@ -54,5 +56,13 @@ void go_next_stage(GameStates* gs);
  * @param gs 
  */
 void go_previous_stage(GameStates* gs);
+
+/**
+ * @brief Met a jour le chemin vers lescalier
+ * 
+ * @param gs 
+ */
+void update_path_to_stair(GameStates* gs);
+
 
 #endif

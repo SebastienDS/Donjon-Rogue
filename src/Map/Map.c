@@ -290,6 +290,7 @@ static void set_stair_down(Map* map, Cell* stair_up) {
 
     int index = randrange(0, list->length - 1);
     Cell* stair_down = (Cell*)arrayList_get(list, index);
+    map->stair_down = stair_down;
 
     stair_down->type = STAIR_DOWN;
     printf("%d %d\n", stair_down->x, stair_down->y);
@@ -313,14 +314,19 @@ void generate_stage(Map* map){
     set_stair_down(map, cell);
 }
 
+bool is_walkable(Map* map, int i, int j) {
+    Cell* cell = get_cell(map, i, j);
+    return cell->type == ROOM || (cell->type == TREASURE && cell->treasure.state == OPEN) || cell->type == STAIR_DOWN || cell->type == STAIR_UP;
+}
+
+
 static bool can_move(Map* map, Player* player, int dx, int dy) {
     int x = player->pos.x + dx;
     int y = player->pos.y + dy;
 
     if (!is_on_the_grid(x, y)) return false;
 
-    Cell* cell = get_cell(map, x, y);
-    return cell->type == ROOM || (cell->type == TREASURE && cell->treasure.state == OPEN) || cell->type == STAIR_DOWN || cell->type == STAIR_UP;
+    return is_walkable(map, x, y);
 }
 
 static void move(Map* map, Player* player, int dx, int dy) {

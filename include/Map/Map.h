@@ -23,6 +23,7 @@ typedef struct {
 
 typedef struct {
     Cell map[HEIGHT][WIDTH];
+    Cell* stair_down;
 } Map;
 
 /**
@@ -82,6 +83,17 @@ bool is_at_the_border(int x, int y);
  * @param map 
  */
 void generate_stage(Map* map);
+
+/**
+ * @brief Renvoie si l'on peut marcher sur la cellule (x, y)
+ * 
+ * @param map 
+ * @param x 
+ * @param y 
+ * @return true 
+ * @return false 
+ */
+bool is_walkable(Map* map, int x, int y);
 
 /**
  * @brief Renvoie si le joueur à réussie à se déplacer dans la direction (dx, dy)

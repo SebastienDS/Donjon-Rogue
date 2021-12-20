@@ -4,6 +4,7 @@
 #include "Map/Map.h"
 #include "Entity/Player.h"
 #include "Core/GameStates.h"
+#include "Util/PathFinding/Astar.h"
 #include "constants.h"
 
 static void draw_map(Map* map, Player* player, Images* images) {
@@ -65,7 +66,33 @@ static void draw_player(Player* player, Images* images) {
     MLV_draw_image(images->player, (SCREEN_WIDTH - CELL_SIZE) / 2, (SCREEN_HEIGHT - CELL_SIZE) / 2);
 }
 
+static void draw_path_to_stair(GameStates* gs) {
+    Player* player = get_player(gs);
+
+    int p_x = player->pos.x;
+    int p_y = player->pos.y;
+
+    int width = VISION_X / 2;
+    int height = VISION_Y / 2;
+
+    int offset_x = CELL_SIZE * (p_x - width);
+    int offset_y = CELL_SIZE * (p_y - height);
+
+    Node* node;
+    for (node = gs->path_to_stair->node; node != NULL; node = node->next) {
+        PathPosition* position = (PathPosition*)node->value;
+        int x = position->x * CELL_SIZE - offset_x;
+        int y = position->y * CELL_SIZE - offset_y;
+
+        MLV_draw_rectangle(x, y, CELL_SIZE, CELL_SIZE, MLV_COLOR_DEEP_PINK);
+    }
+}
+
 void draw_graphics(GameStates* gs, Images* images) {
     draw_map(get_current_map(gs), get_player(gs), images);
+
+    #if DEBUG
+        if (gs->path_to_stair != NULL) draw_path_to_stair(gs);
+    #endif
     draw_player(get_player(gs), images);
 }

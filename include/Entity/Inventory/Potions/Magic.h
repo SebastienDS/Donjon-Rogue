@@ -3,7 +3,6 @@
 
 typedef struct {
     int mp;
-    int duration;
 } Magic;
 
 #endif

@@ -26,7 +26,7 @@ void init_game_states(GameStates* gs);
 void destroy_game_states(GameStates* gs);
 
 /**
- * @brief Get the player object
+ * @brief Renvoie le joueur
  * 
  * @param gs 
  * @return Player* 
@@ -34,7 +34,7 @@ void destroy_game_states(GameStates* gs);
 Player* get_player(GameStates* gs);
 
 /**
- * @brief Get the current map object
+ * @brief Renvoie la map
  * 
  * @param gs 
  * @return Map* 

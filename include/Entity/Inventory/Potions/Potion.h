@@ -22,4 +22,28 @@ typedef struct {
     };
 } Potion;
 
+
+/**
+ * @brief Crée une nouvelle potion
+ * 
+ * @param type 
+ * @return Potion* 
+ */
+Potion* potion_new(PotionType type);
+
+/**
+ * @brief Libère la mémoire allouée par la potion
+ * 
+ * @param potion 
+ */
+void potion_free(Potion* potion);
+
+/**
+ * @brief Renvoie une potion aléatoire
+ * 
+ * @param difficulty 
+ * @return Potion* 
+ */
+Potion* get_random_potion(int difficulty);
+
 #endif

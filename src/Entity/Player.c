@@ -1,9 +1,11 @@
 #include "Entity/Player.h"
 #include "Entity/Monster.h"
+#include "Entity/Inventory/Inventory.h"
 #include "constants.h"
 #include <assert.h>
 #include <stdlib.h>
 #include "Util/random.h"
+
 #define CRIT_MULTIPLICATOR 3
 
 void init_player(Player* self, int x, int y) {
@@ -20,6 +22,8 @@ void init_player(Player* self, int x, int y) {
     self->exp = 0;
     self->hp = get_hp_player(self); 
     self->mp = get_mp_player(self);
+
+    init_inventory(&self->inventory);
 }
 
 int get_hp_player(Player* self){

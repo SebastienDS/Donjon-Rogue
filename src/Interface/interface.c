@@ -66,7 +66,7 @@ static void print_instruction(char key, char* text, MLV_Font* font, int y){
 
     sprintf(str, "%s - %c", text, key);
     MLV_get_size_of_text_with_font(str, &width, &height, font);
-    MLV_draw_text_with_font(SCREEN_WIDTH - width - 15, SCREEN_HEIGHT / 2 + y * (height + 15), str, font, MLV_COLOR_WHITE_SMOKE);
+    MLV_draw_text_with_font(15, SCREEN_HEIGHT - (y + 1) * height, str, font, MLV_COLOR_WHITE_SMOKE);
 }
 
 
@@ -82,11 +82,8 @@ void print_actions(GameStates* gs, MLV_Font* font){
         switch (cell->type)
         {
             case STAIR_UP:
-                print_instruction('P', "Previous floor", font, i);
-                break;
-
             case STAIR_DOWN:
-                print_instruction('N', "Next floor", font, i);
+                print_instruction('E', "Use stair", font, i);
                 break;
 
             case TREASURE:  

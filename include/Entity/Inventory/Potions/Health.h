@@ -3,7 +3,6 @@
 
 typedef struct {
     int hp;
-    int duration;
 } Health;
 
 #endif

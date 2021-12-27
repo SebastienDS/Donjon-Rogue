@@ -6,9 +6,9 @@
 #include "Entity/Monster.h"
 
 #define NB_POTIONS 3
-#define REGENERATION 0
-#define ACCURACY 1
-#define EXPERIENCE 2
+#define REGENERATION_INDEX 0
+#define ACCURACY_INDEX 1
+#define EXPERIENCE_INDEX 2
 
 /* 
     [0] -> regeneration 

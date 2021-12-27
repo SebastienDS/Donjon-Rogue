@@ -9,11 +9,13 @@
 #define CRIT_MULTIPLICATOR 3
 
 void init_player(Player* self, int x, int y) {
+    int i;
+
     self->pos.x = x;
     self->pos.y = y;
-    self->bonus.potions[REGENERATION] = NULL;
-    self->bonus.potions[ACCURACY] = NULL;
-    self->bonus.potions[EXPERIENCE] = NULL;
+    self->bonus.potions[REGENERATION_INDEX] = NULL;
+    self->bonus.potions[ACCURACY_INDEX] = NULL;
+    self->bonus.potions[EXPERIENCE_INDEX] = NULL;
     self->atk = 10;
     self->intel = 10;
     self->def = 10;
@@ -24,6 +26,10 @@ void init_player(Player* self, int x, int y) {
     self->mp = get_mp_player(self);
 
     init_inventory(&self->inventory);
+    for (i = 0; i < 12; i++){
+        self->inventory.items[i] = get_random_item(1);
+        
+    }
 }
 
 int get_hp_player(Player* self){

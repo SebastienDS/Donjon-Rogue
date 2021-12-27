@@ -19,7 +19,7 @@ typedef struct {
 } Item;
 
 typedef struct {
-    Item* item[NB_ITEMS];
+    Item* items[NB_ITEMS];
 } Inventory;
 
 

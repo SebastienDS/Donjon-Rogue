@@ -8,7 +8,7 @@
 void init_inventory(Inventory* inventory) {
     int i;
     for (i = 0; i < NB_ITEMS; i++) {
-        inventory->item[i] = NULL;
+        inventory->items[i] = NULL;
     }
 }
 

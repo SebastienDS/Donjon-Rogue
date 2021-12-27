@@ -108,6 +108,9 @@ static bool update_action_from_input(GameStates* gs, Events* events, Action* act
             action->type = USE_STAIR;
             action->cell = cell;
             return true;
+        case MLV_KEYBOARD_i:
+            gs->inventory_is_open = !gs->inventory_is_open;
+            return true;
         default:
             break;
     }

@@ -18,6 +18,7 @@ void init_game_states(GameStates* gs) {
     gs->maps = arrayList_new();
     gs->current_stage = 0;
     gs->path_to_stair = NULL;
+    gs->inventory_is_open = false;
 
     Map* map = map_new();
     arrayList_add(gs->maps, map);

@@ -5,12 +5,14 @@
 #include "Util/LinkedList.h"
 #include "Map/Map.h"
 #include "Entity/Player.h"
+#include <stdbool.h>
 
 typedef struct {
     ArrayList* maps; /* ArrayList<Map> */
     int current_stage;
     Player player;
     LinkedList* path_to_stair; /* LinkedList<Position> */
+    bool inventory_is_open;
 } GameStates;
 
 /**

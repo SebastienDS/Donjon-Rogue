@@ -131,7 +131,7 @@ static void draw_stat_potion(Potion* potion, MLV_Font* font){
         break;
     }
     /*MLV_draw_text(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 30 - height, str, MLV_COLOR_WHITE_SMOKE);*/
-    MLV_draw_text_box_with_font(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT / 2, SCREEN_WIDTH * 2 / 5 - 45, 300, str, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_MAGENTA, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box_with_font(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT / 2, SCREEN_WIDTH * 2 / 5 - 45, 300, str, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
 }
 
 static void draw_stat_equipment(Equipment* equipment, MLV_Font* font){
@@ -152,7 +152,7 @@ static void draw_stat_equipment(Equipment* equipment, MLV_Font* font){
         break;
     }
     /*MLV_draw_text(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 30 - height, str, MLV_COLOR_WHITE_SMOKE);*/
-    MLV_draw_text_box_with_font(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT / 2, SCREEN_WIDTH * 2 / 5 - 45, 300, str, font, 15, MLV_COLOR_GRAY, MLV_COLOR_MAGENTA, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box_with_font(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT / 2, SCREEN_WIDTH * 2 / 5 - 45, 300, str, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
 }
 
 
@@ -173,11 +173,18 @@ static void draw_stats(GameStates* gs, MLV_Font* font){
     }
 }
 
+static void draw_button(Button* button, MLV_Font* font){
+    MLV_draw_text_box_with_font(button->x, button->y, button->width, button->height, button->label, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+
+}
 
 static void draw_inventory(GameStates* gs, MLV_Font* font){
     MLV_draw_filled_rectangle(SCREEN_WIDTH * 3 / 5, 15, SCREEN_WIDTH * 2 / 5 - 15, SCREEN_HEIGHT - 30, MLV_COLOR_GRAY);
     draw_items(gs);
     draw_stats(gs, font);
+    draw_button(&gs->inventory.equip, font);
+    draw_button(&gs->inventory.use, font);
+    draw_button(&gs->inventory.throw, font);
 }
 
 
@@ -192,7 +199,7 @@ void draw_interface(GameStates* gs, MLV_Font* font) {
     print_floor(gs->current_stage, font);
     print_actions(gs, font);
 
-    if(gs->inventory_is_open) draw_inventory(gs, font);
+    if(gs->inventory.inventory_is_open) draw_inventory(gs, font);
 }
 
 

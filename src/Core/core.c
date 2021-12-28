@@ -94,6 +94,29 @@ static bool update_action_from_player_movement(GameStates* gs, Events* events, A
     return false;
 }
 
+static bool test_click(Button* button, int x, int y){
+    return button->x <= x && button->x + button->width >= x 
+        && button->y <= y && button->y + button->height >= y;
+}
+
+static bool update_action_from_mouse(GameStates* gs, Events* events, Action* action){
+    if( events->event == MLV_MOUSE_BUTTON && events->state == MLV_PRESSED){
+        if(test_click(&gs->inventory.equip, events->mouseX, events->mouseY)){
+            gs->inventory.equip.callback(gs);  
+            return true; 
+        }
+        else if(test_click(&gs->inventory.use, events->mouseX, events->mouseY)){
+            gs->inventory.use.callback(gs);   
+            return true; 
+        }
+        else if(test_click(&gs->inventory.throw, events->mouseX, events->mouseY)){
+            gs->inventory.throw.callback(gs);   
+            return true; 
+        }
+    }
+    return false;
+}
+
 static bool update_action_from_input(GameStates* gs, Events* events, Action* action) {
     if (!(events->event == MLV_KEY && events->state == MLV_PRESSED)) return false;
 
@@ -109,7 +132,7 @@ static bool update_action_from_input(GameStates* gs, Events* events, Action* act
             action->cell = cell;
             return true;
         case MLV_KEYBOARD_i:
-            gs->inventory_is_open = !gs->inventory_is_open;
+            gs->inventory.inventory_is_open = !gs->inventory.inventory_is_open;
             return true;
         default:
             break;
@@ -121,7 +144,8 @@ static bool update_action_from_input(GameStates* gs, Events* events, Action* act
 void update(GameStates* gs, Events* events) {
     Action* action = action_new();
 
-    update_action_from_input(gs, events, action)
+    update_action_from_mouse(gs, events, action)
+        || update_action_from_input(gs, events, action)
         || update_action_from_player_movement(gs, events, action)
         || update_player_movement(gs, events);
 

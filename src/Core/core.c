@@ -137,15 +137,43 @@ static bool test_click(Button* button, int x, int y){
         && button->y <= y && button->y + button->height >= y;
 }
 
+static bool verif_click_item_inventory(int x, int y){
+    static int start_x = SCREEN_WIDTH * 3 / 5 + 15;
+    static int start_y = 30;
+    static int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
+    int width = width_items * 4;
+    int height = width_items * 3;
+
+    return start_x <= x && start_x + width >= x
+        && start_y <= y && start_y + height >= y;
+}
+
+static void get_item_selected(GameStates* gs, int x, int y){
+    static int start_x = SCREEN_WIDTH * 3 / 5 + 15;
+    static int start_y = 30;
+    static int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
+
+    int i = (x - start_x) / width_items;
+    int j = (y - start_y) / width_items;
+    
+    gs->inventory.item_selected = get_player(gs)->inventory.items[i + j * 4];
+}
+
 static bool update_action_from_mouse(GameStates* gs, Events* events, Action* action) {
     if (!(events->event == MLV_MOUSE_BUTTON && events->state == MLV_PRESSED)) return false;
+    
+    Item* item = gs->inventory.item_selected;
 
     if (gs->inventory.is_open) {
-        if(test_click(&gs->inventory.equip, events->mouseX, events->mouseY)) {
+        if(verif_click_item_inventory(events->mouseX, events->mouseY)) get_item_selected(gs, events->mouseX, events->mouseY);
+
+        if (item == NULL) return false;
+
+        if(item->type == EQUIPMENT && test_click(&gs->inventory.equip, events->mouseX, events->mouseY)) {
             gs->inventory.equip.callback(gs);  
             return true; 
         }
-        else if(test_click(&gs->inventory.use, events->mouseX, events->mouseY)) {
+        else if(item->type == POTION && test_click(&gs->inventory.use, events->mouseX, events->mouseY)) {
             gs->inventory.use.callback(gs);   
             return true; 
         }

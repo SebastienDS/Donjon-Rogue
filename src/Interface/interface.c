@@ -99,15 +99,51 @@ void print_actions(GameStates* gs, MLV_Font* font){
     arrayList_free(list, NULL);
 }
 
+static void get_type_equipment(Equipment* equipment, int i, int j){
+    static int start_x = SCREEN_WIDTH * 3 / 5 + 15;
+    static int start_y = 30;
+    static int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
+
+    switch (equipment->type)
+    {
+    case WEAPON:
+        MLV_draw_filled_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_BLUE);
+        break;
+    case ARMOR:
+        MLV_draw_filled_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_GREEN);
+        break;
+    case MAGICWAND:
+        MLV_draw_filled_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_RED);
+        break;
+    default:
+        break;
+    }
+}
+
 static void draw_items(GameStates* gs){
     int i, j;
-    int start_x = SCREEN_WIDTH * 3 / 5 + 15;
-    int start_y = 30;
-    int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
+    static int start_x = SCREEN_WIDTH * 3 / 5 + 15;
+    static int start_y = 30;
+    static int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
+    Player* player = get_player(gs);
 
     for (j = 0; j < 3; j++){
         for (i = 0; i < 4; i++){
-            MLV_draw_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_MAGENTA);
+            Item* item = player->inventory.items[i + j * 4];
+
+            if (item == NULL) continue;
+
+            switch (item->type)
+            {
+            case EQUIPMENT:
+                get_type_equipment(item->equipment, i, j);
+                break;
+            case POTION:
+                MLV_draw_filled_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_YELLOW);
+                break;
+            default:
+                break;
+            }
         }
     }
 }
@@ -118,25 +154,25 @@ static void draw_stat_potion(Potion* potion, MLV_Font* font){
     switch (potion->type)
     {
     case ACCURACY:
-        sprintf(str, "Accuracy potion : \nCrit : %d\nDuration : %d", potion->accuracy.crit, potion->accuracy.duration);
+        sprintf(str, "Accuracy potion\nCrit : %d\nDuration : %d", potion->accuracy.crit, potion->accuracy.duration);
         break;
     case EXPERIENCE:
-        sprintf(str, "Experience potion : \nExp : %d\nDuration : %d", potion->experience.exp, potion->experience.duration);
+        sprintf(str, "Experience potion\nExp : %d\nDuration : %d", potion->experience.exp, potion->experience.duration);
         break;
     case HEALTH:
-        sprintf(str, "Health potion : \nHP : %d", potion->health.hp);
+        sprintf(str, "Health potion\nHP : %d", potion->health.hp);
         break;
     case MAGIC:
-        sprintf(str, "Magic potion : \nMP : %d", potion->magic.mp);
+        sprintf(str, "Magic potion\nMP : %d", potion->magic.mp);
         break;
     case REGENERATION:
-        sprintf(str, "Regeneration potion : \nHP : %d\nMP : %d\nDuration : %d\nInterval : %d", potion->regeration.hp, potion->regeration.mp, potion->regeration.duration, potion->regeration.interval);
+        sprintf(str, "Regeneration potion\nHP : %d\nMP : %d\nDuration : %d\nInterval : %d", potion->regeration.hp, potion->regeration.mp, potion->regeration.duration, potion->regeration.interval);
         break;
     default:
         break;
     }
     /*MLV_draw_text(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 30 - height, str, MLV_COLOR_WHITE_SMOKE);*/
-    MLV_draw_text_box_with_font(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT / 2, SCREEN_WIDTH * 2 / 5 - 45, 300, str, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box_with_font(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT / 2 - 15, SCREEN_WIDTH * 2 / 5 - 45, 330, str, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
 }
 
 static void draw_stat_equipment(Equipment* equipment, MLV_Font* font){
@@ -157,13 +193,12 @@ static void draw_stat_equipment(Equipment* equipment, MLV_Font* font){
         break;
     }
     /*MLV_draw_text(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 30 - height, str, MLV_COLOR_WHITE_SMOKE);*/
-    MLV_draw_text_box_with_font(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT / 2, SCREEN_WIDTH * 2 / 5 - 45, 300, str, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box_with_font(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT / 2 - 15, SCREEN_WIDTH * 2 / 5 - 45, 330, str, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
 }
 
 
-static void draw_stats(GameStates* gs, MLV_Font* font){
-    Item* item = get_player(gs)->inventory.items[0];
-
+static void draw_stats(GameStates* gs, Item* item, MLV_Font* font){
+   
     switch (item->type)
     {
     case POTION:
@@ -184,12 +219,19 @@ static void draw_button(Button* button, MLV_Font* font){
 }
 
 static void draw_inventory(GameStates* gs, MLV_Font* font){
+    Item* item = gs->inventory.item_selected;
+
     MLV_draw_filled_rectangle(SCREEN_WIDTH * 3 / 5, 15, SCREEN_WIDTH * 2 / 5 - 15, SCREEN_HEIGHT - 30, MLV_COLOR_GRAY);
     draw_items(gs);
-    draw_stats(gs, font);
+    if (item == NULL) return;
 
-    draw_button(&gs->inventory.equip, font);
-    draw_button(&gs->inventory.use, font);
+    draw_stats(gs, item, font);
+    if (item->type == EQUIPMENT){
+        draw_button(&gs->inventory.equip, font);
+    }
+    else{
+        draw_button(&gs->inventory.use, font);
+    }
     draw_button(&gs->inventory.throw, font);
 }
 

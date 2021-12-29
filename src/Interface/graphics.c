@@ -1,15 +1,20 @@
 #include <MLV/MLV_all.h>
+#include <stdlib.h>
+#include <math.h>
+
 #include "Interface/graphics.h"
 #include "Interface/Images.h"
+#include "Interface/View.h"
 #include "Map/Map.h"
 #include "Entity/Player.h"
 #include "Core/GameStates.h"
 #include "Util/PathFinding/Astar.h"
+#include "Util/util.h"
 #include "constants.h"
 
 static void draw_map(Map* map, Player* player, Images* images) {
-    int p_x = player->pos.x;
-    int p_y = player->pos.y;
+    int p_x = player->position.x;
+    int p_y = player->position.y;
 
     int width = VISION_X / 2;
     int height = VISION_Y / 2;
@@ -69,8 +74,8 @@ static void draw_player(Player* player, Images* images) {
 static void draw_path_to_stair(GameStates* gs) {
     Player* player = get_player(gs);
 
-    int p_x = player->pos.x;
-    int p_y = player->pos.y;
+    int p_x = player->position.x;
+    int p_y = player->position.y;
 
     int width = VISION_X / 2;
     int height = VISION_Y / 2;
@@ -88,11 +93,11 @@ static void draw_path_to_stair(GameStates* gs) {
     }
 }
 
-void draw_graphics(GameStates* gs, Images* images) {
-    draw_map(get_current_map(gs), get_player(gs), images);
+void draw_graphics(GameStates* gs, View* view) {
+    draw_map(get_current_map(gs), get_player(gs), &view->images);
 
     #if DEBUG
         if (gs->path_to_stair != NULL) draw_path_to_stair(gs);
     #endif
-    draw_player(get_player(gs), images);
+    draw_player(get_player(gs), &view->images);
 }

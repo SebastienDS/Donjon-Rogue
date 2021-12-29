@@ -4,6 +4,7 @@
 #include "Entity/Inventory/Potions/Potion.h"
 #include "Entity/Inventory/Inventory.h"
 #include "Entity/Monster.h"
+#include "Map/Map.h"
 
 #define NB_POTIONS 3
 #define REGENERATION_INDEX 0
@@ -21,9 +22,9 @@ typedef struct {
 } Bonus;
 
 typedef struct {
-    int x;
-    int y;
-} Position;
+    double x;
+    double y;
+} Vector;
 
 typedef struct {
     int hp;
@@ -36,7 +37,10 @@ typedef struct {
     int crit;
     Inventory inventory;
     Bonus bonus;
-    Position pos;
+    Vector position;
+
+    Vector direction;
+    Vector plane;
 } Player;
 
 /**
@@ -77,6 +81,26 @@ void physical_attack(Player* self, Monster* monster);
  * @param monster 
  */
 void magical_attack(Player* self, Monster* monster);
+
+/**
+ * @brief Renvoie si le joueur à réussie à se déplacer dans la direction (dx, dy)
+ * 
+ * @param player 
+ * @param map 
+ * @param dx 
+ * @param dy 
+ * @return true 
+ * @return false 
+ */
+bool try_move(Player* player, Map* map, int dx, int dy);
+
+/**
+ * @brief Tourne le joueur de X radians
+ * 
+ * @param self 
+ * @param radians 
+ */
+void rotate_player(Player* self, double radians);
 
 
 #endif

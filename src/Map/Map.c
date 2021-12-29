@@ -318,25 +318,3 @@ bool is_walkable(Map* map, int i, int j) {
     Cell* cell = get_cell(map, i, j);
     return cell->type == ROOM || (cell->type == TREASURE && cell->treasure.state == OPEN) || cell->type == STAIR_DOWN || cell->type == STAIR_UP;
 }
-
-
-static bool can_move(Map* map, Player* player, int dx, int dy) {
-    int x = player->pos.x + dx;
-    int y = player->pos.y + dy;
-
-    if (!is_on_the_grid(x, y)) return false;
-
-    return is_walkable(map, x, y);
-}
-
-static void move(Map* map, Player* player, int dx, int dy) {
-    player->pos.x += dx;
-    player->pos.y += dy;
-}
-
-bool try_move(Map* map, Player* player, int dx, int dy) {
-    if (!can_move(map, player, dx, dy)) return false;
-
-    move(map, player, dx, dy);
-    return true;
-}

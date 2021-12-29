@@ -3,7 +3,7 @@
 
 #include "Core/GameStates.h"
 #include "Core/Events.h"
-#include "Interface/Images.h"
+#include "Interface/View.h"
 #include <MLV/MLV_all.h>
 
 
@@ -20,9 +20,8 @@ void update(GameStates* gs, Events* events);
  * @brief Affiche le jeu
  * 
  * @param gs
- * @param images
- * @param font
+ * @param view
  */
-void draw(GameStates* gs, Images* images, MLV_Font* font);
+void draw(GameStates* gs, View* view);
 
 #endif

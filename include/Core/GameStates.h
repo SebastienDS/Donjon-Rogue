@@ -10,6 +10,11 @@
 typedef struct GameStates GameStates;
 
 
+typedef enum {
+    DEFAULT, RAYCASTING
+} ViewType;
+
+
 typedef struct {
     int x;
     int y;
@@ -20,18 +25,22 @@ typedef struct {
 } Button;
 
 typedef struct {
-    bool inventory_is_open;
+    bool is_open;
     Button equip;
     Button use;
     Button throw;
 } Inventory_;
 
 typedef struct GameStates {
+    ViewType viewType;
+
     ArrayList* maps; /* ArrayList<Map> */
     int current_stage;
     Player player;
-    LinkedList* path_to_stair; /* LinkedList<Position> */
+
     Inventory_ inventory;
+
+    LinkedList* path_to_stair; /* LinkedList<PathPosition> */
 } GameStates;
 
 /**

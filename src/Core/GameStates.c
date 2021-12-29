@@ -15,6 +15,9 @@ static bool is_walkable_func(Element* grid, int i, int j) {
 }
 
 void init_game_states(GameStates* gs) {
+    gs->viewType = DEFAULT;
+
+
     gs->maps = arrayList_new();
     gs->current_stage = 0;
     gs->path_to_stair = NULL;
@@ -57,8 +60,8 @@ static void set_player_position(GameStates* gs, Celltype cell_type) {
             Cell* cell = get_cell(map, i, j);
 
             if (cell->type == cell_type) {
-                player->pos.x = i;
-                player->pos.y = j;
+                player->position.x = i;
+                player->position.y = j;
 
                 return;
             }
@@ -116,7 +119,7 @@ void update_path_to_stair(GameStates* gs) {
     Player* player = get_player(gs);
     Map* map = get_current_map(gs);
 
-    PathPosition* start = path_position_new(player->pos.x, player->pos.y);
+    PathPosition* start = path_position_new(player->position.x, player->position.y);
     PathPosition* end = path_position_new(map->stair_down->x, map->stair_down->y);
 
     gs->path_to_stair = astar(map, start, end, is_walkable_func, WIDTH, HEIGHT);

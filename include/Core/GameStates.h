@@ -6,11 +6,18 @@
 #include "Map/Map.h"
 #include "Entity/Player.h"
 
+typedef enum {
+    DEFAULT, RAYCASTING
+} ViewType;
+
+
 typedef struct {
+    ViewType viewType;
     ArrayList* maps; /* ArrayList<Map> */
     int current_stage;
     Player player;
-    LinkedList* path_to_stair; /* LinkedList<Position> */
+
+    LinkedList* path_to_stair; /* LinkedList<PathPosition> */
 } GameStates;
 
 /**

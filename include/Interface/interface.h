@@ -1,8 +1,9 @@
 #ifndef __INTERFACE__
 #define __INTERFACE__
 
-#include "Core/GameStates.h"
 #include <MLV/MLV_all.h>
+#include "Core/GameStates.h"
+#include "Interface/View.h"
 
 
 /**
@@ -11,7 +12,7 @@
  * @param gs 
  * @param font
  */
-void draw_interface(GameStates* gs, MLV_Font* font);
+void draw_interface(GameStates* gs, View* view);
 
 /**
  * @brief Affiche les différentes barres du jeu (points de vie, mana)
@@ -41,6 +42,18 @@ void print_floor(int floor, MLV_Font* font);
  * @param font 
  */
 void print_actions(GameStates* gs, MLV_Font* font);
+
+/**
+ * @brief Affiche la mini map de l'étage
+ * 
+ * @param gs
+ * @param view 
+ * @param start_x 
+ * @param start_y 
+ * @param cell_size 
+ */
+void draw_mini_map(GameStates* gs, View* view, int start_x, int start_y, int cell_size);
+
 
 
 #endif

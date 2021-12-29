@@ -24,7 +24,7 @@ typedef struct {
  * 
  * @param img 
  */
-void init_images(Images* img);
+void init_images(Images* img, int size);
 
 /**
  * @brief Libere la memoire allouee lors de linitialisation

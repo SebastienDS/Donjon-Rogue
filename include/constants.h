@@ -15,6 +15,15 @@
 #define SCREEN_WIDTH VISION_X * CELL_SIZE
 #define SCREEN_HEIGHT VISION_Y * CELL_SIZE
 
+#define TEXTURE_SIZE 64
+
+
 #define DEBUG 1
+
+
+#ifndef M_PI
+#    define M_PI 3.14159265358979323846
+#endif
+
 
 #endif

@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include "Entity/Monster.h"
 #include "Entity/Treasure.h"
-#include "Entity/Player.h"
 #include "constants.h"
 
 typedef enum {
@@ -94,18 +93,6 @@ void generate_stage(Map* map);
  * @return false 
  */
 bool is_walkable(Map* map, int x, int y);
-
-/**
- * @brief Renvoie si le joueur à réussie à se déplacer dans la direction (dx, dy)
- * 
- * @param map 
- * @param player 
- * @param dx 
- * @param dy 
- * @return true 
- * @return false 
- */
-bool try_move(Map* map, Player* player, int dx, int dy);
 
 
 #endif

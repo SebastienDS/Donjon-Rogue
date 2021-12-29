@@ -154,6 +154,7 @@ static bool update_action_from_mouse(GameStates* gs, Events* events, Action* act
             return true; 
         }
     }
+    return false;
 }
 
 static bool update_action_from_input(GameStates* gs, Events* events, Action* action) {

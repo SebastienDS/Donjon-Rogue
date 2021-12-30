@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "Entity/Monster.h"
 #include "Entity/Treasure.h"
+#include "Util/ArrayList.h"
 #include "constants.h"
 
 typedef enum {
@@ -93,6 +94,17 @@ void generate_stage(Map* map);
  * @return false 
  */
 bool is_walkable(Map* map, int x, int y);
+
+/**
+ * @brief Renvoie les cellules voisines du type choisi
+ * 
+ * @param map 
+ * @param cell 
+ * @param type 
+ * @return ArrayList* ArrayList<Cell*>
+ */
+ArrayList* find_neighbors(Map* map, Cell* cell, Celltype type);
+
 
 
 #endif

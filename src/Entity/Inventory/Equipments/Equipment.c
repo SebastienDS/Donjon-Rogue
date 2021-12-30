@@ -26,7 +26,7 @@ Equipment* get_random_equipment(int difficulty) {
     int quality = MAX(1, randrange(difficulty * 0.5, difficulty * 1.5));
 
 
-    Equipment* equipment;
+    Equipment* equipment = NULL;
 
     switch (random)
     {
@@ -46,6 +46,8 @@ Equipment* get_random_equipment(int difficulty) {
         equipment->magic_wand.quality = quality;
         break;
     default:
+        fprintf(stderr, "Invalid Equipment type index\n");
+        exit(1);
         break;
     }
 

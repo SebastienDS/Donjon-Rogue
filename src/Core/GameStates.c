@@ -39,6 +39,8 @@ static void set_button(Button* button, int x, int y, int width, int height, char
 void init_game_states(GameStates* gs) {
     gs->viewType = DEFAULT;
 
+    gs->end_turn = false;
+
     gs->maps = arrayList_new();
     gs->current_stage = 0;
     gs->path_to_stair = NULL;

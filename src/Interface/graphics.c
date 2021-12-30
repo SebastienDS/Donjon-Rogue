@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include "Interface/graphics.h"
+#include "Interface/interface.h"
 #include "Interface/Images.h"
 #include "Interface/View.h"
 #include "Map/Map.h"
@@ -52,7 +53,7 @@ static void draw_map(Map* map, Player* player, Images* images) {
             else if (cell->type == MONSTER) {
                 MLV_draw_image(images->floor, x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y);
                 MLV_draw_image(images->zombie, x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y);
-
+                draw_bar(x * CELL_SIZE - offset_x + 5, y * CELL_SIZE - offset_y + 2, CELL_SIZE - 10, 15, MLV_COLOR_GREEN, cell->monster.hp, cell->monster.max_hp);
             } 
             else if (cell->type == ROOM){
                 MLV_draw_image(images->floor, x * CELL_SIZE - offset_x, y * CELL_SIZE - offset_y);

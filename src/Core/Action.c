@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 Action* action_new(void){
     Action* action = (Action*) malloc (sizeof(Action));
@@ -26,6 +27,7 @@ static void remove_if_dead(Cell* cell){
 
 void apply_action(Action* action, GameStates* gs) {
     Cell* cell;
+    bool attack_succeed;
 
     switch (action->type) {
         case OPEN_TREASURE:
@@ -33,9 +35,15 @@ void apply_action(Action* action, GameStates* gs) {
             break;
         
         case FIGHT_MONSTER:
-            physical_attack(get_player(gs), &action->cell->monster);
-            printf("hp : %d \n", action->cell->monster.hp);
-            remove_if_dead(action->cell);
+            attack_succeed = attack_monster(get_player(gs), &action->cell->monster);
+            if (attack_succeed) {
+                printf("hp : %d \n", action->cell->monster.hp);
+                remove_if_dead(action->cell);
+                
+                gs->end_turn = true;
+            } else {
+                printf("ATTACK FAILED %d\n", get_player(gs)->mp);
+            }
             break;
         case USE_STAIR:
             cell = action->cell;

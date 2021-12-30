@@ -1,10 +1,13 @@
 #ifndef __MONSTER__
 #define __MONSTER__
+
 #include <stdbool.h>
 
 typedef struct {
+    int max_hp;
     int hp;
     int atk;
+    int crit;
 } Monster;
 
 /**
@@ -22,5 +25,6 @@ void init_monster(Monster* monster);
  * @return false 
  */
 bool is_dead(Monster* monster);
+
 
 #endif

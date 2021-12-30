@@ -14,7 +14,7 @@
 #define CRIT_MULTIPLICATOR 3
 
 void init_player(Player* self, int x, int y) {
-    int i;
+    self->attackType = PHYSICAL;
 
     self->position.x = x;
     self->position.y = y;
@@ -26,6 +26,13 @@ void init_player(Player* self, int x, int y) {
     self->plane.y = -0.66;
     rotate_player(self, M_PI / 2.0);
 
+    self->bonus.regeneration = NULL;
+    self->bonus.accuracy = NULL;
+    self->bonus.experience = NULL;
+    self->bonus.weapon = NULL;
+    self->bonus.magic_wand = NULL;
+    self->bonus.armor = NULL;
+
     self->atk = 10;
     self->intel = 10;
     self->def = 10;
@@ -35,30 +42,35 @@ void init_player(Player* self, int x, int y) {
     self->hp = get_hp_player(self); 
     self->mp = get_mp_player(self);
 
-    self->bonus.potions[REGENERATION_INDEX] = NULL;
-    self->bonus.potions[ACCURACY_INDEX] = NULL;
-    self->bonus.potions[EXPERIENCE_INDEX] = NULL;
-
     init_inventory(&self->inventory);
-    for (i = 0; i < 12; i++){
-        self->inventory.items[i] = get_random_item(1);
-    }
 }
 
 int get_hp_player(Player* self){
-    return 10 * self->def;
+    return 10 * get_def(self);
 }
 
 int get_mp_player(Player* self){
-    return 10 * self->intel - 50;
+    return 10 * get_intel(self) - 50;
 }
 
-static int get_crit(Player* self){
-    if (self->bonus.potions[ACCURACY] == NULL){
-        return self->crit;
-    }
-    assert(self->bonus.potions[ACCURACY]->type == ACCURACY);
-    return self->bonus.potions[ACCURACY]->accuracy.crit;
+int get_atk(Player* self) {
+    int bonus = self->bonus.weapon == NULL ? 0 : self->bonus.weapon->weapon.quality; 
+    return self->atk + bonus;
+}
+
+int get_def(Player* self) {
+    int bonus = self->bonus.armor == NULL ? 0 : self->bonus.armor->armor.quality; 
+    return self->def + bonus;
+}
+
+int get_intel(Player* self) {
+    int bonus = self->bonus.weapon == NULL ? 0 : self->bonus.magic_wand->magic_wand.quality; 
+    return self->intel + bonus;
+}
+
+int get_crit(Player* self) {
+    int bonus = self->bonus.accuracy == NULL ? 0 : self->bonus.accuracy->accuracy.crit;
+    return self->crit + bonus;
 }
 
 static void attack(Player* self, Monster* monster, int dmg){
@@ -73,14 +85,41 @@ static void attack(Player* self, Monster* monster, int dmg){
 }
 
 void physical_attack(Player* self, Monster* monster){
-    attack(self, monster, self->atk);
+    attack(self, monster, get_atk(self));
+    printf("PHYSICAL\n");
 }
 
 void magical_attack(Player* self, Monster* monster){
     assert(self->mp >= 20);
 
-    attack(self, monster, 2 * self->intel);
+    attack(self, monster, 2 * get_intel(self));
     self->mp -= 20;
+    printf("MAGICAL\n");
+}
+
+bool attack_monster(Player* self, Monster* monster) {
+    switch (self->attackType) {
+    case PHYSICAL:
+        physical_attack(self, monster);
+        return true;
+    case MAGICAL:
+        if (self->mp < 20) return false;
+        magical_attack(self, monster);
+        return true;
+    }
+    return false;
+}
+
+void attack_player(Monster* monster, Player* player) {
+    int crit = monster->crit;
+    int dmg = monster->atk;
+    int random = randrange(0, 100);
+
+    if (random <= crit){
+        dmg *= CRIT_MULTIPLICATOR;
+    }
+
+    player->hp -= dmg;
 }
 
 static bool can_move(Map* map, Player* player, int dx, int dy) {

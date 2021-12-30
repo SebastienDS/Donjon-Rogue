@@ -318,3 +318,23 @@ bool is_walkable(Map* map, int i, int j) {
     Cell* cell = get_cell(map, i, j);
     return cell->type == ROOM || (cell->type == TREASURE && cell->treasure.state == OPEN) || cell->type == STAIR_DOWN || cell->type == STAIR_UP;
 }
+
+ArrayList* find_neighbors(Map* map, Cell* cell, Celltype type) {
+    static const int neighbors[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+    int i, pos_x, pos_y;
+    ArrayList* list = arrayList_new();
+    
+    for (i = 0; i < 4; i++) {
+        pos_x = neighbors[i][0] + cell->x;
+        pos_y = neighbors[i][1] + cell->y;
+
+        Cell* neighbors_cell = get_cell(map, pos_x, pos_y);
+
+        if (is_on_the_grid(pos_x, pos_y) && neighbors_cell->type == type) {
+            arrayList_add(list, neighbors_cell);
+        } 
+    }
+
+    return list;
+}

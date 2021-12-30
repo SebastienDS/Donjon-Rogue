@@ -18,6 +18,13 @@
 void draw_bar(int pos_x, int pos_y, int size_x, int size_y, MLV_Color color, int value, int max){
     MLV_draw_filled_rectangle(pos_x, pos_y, size_x, size_y, MLV_COLOR_GRAY12);
     MLV_draw_filled_rectangle(pos_x, pos_y, value * size_x / max, size_y, color);
+
+    char str[50];
+    int width, height;
+
+    sprintf(str, "%d / %d", value, max);
+    MLV_get_size_of_text(str, &width, &height);
+    MLV_draw_text(pos_x + ((size_x - width) / 2), pos_y + ((size_y - height) / 2), str, MLV_COLOR_WHITE_SMOKE);
 }
 
 void print_floor(int floor, MLV_Font* font){
@@ -61,7 +68,7 @@ static void print_instruction(char key, char* text, MLV_Font* font, int y){
     char str[50];
     int width, height;
 
-    sprintf(str, "%s - %c", text, key);
+    sprintf(str, "%c - %s", key, text);
     MLV_get_size_of_text_with_font(str, &width, &height, font);
     MLV_draw_text_with_font(15, SCREEN_HEIGHT - (y + 1) * height, str, font, MLV_COLOR_WHITE_SMOKE);
 }
@@ -73,7 +80,7 @@ void print_actions(GameStates* gs, MLV_Font* font){
 
     get_possible_action(gs, list);
 
-    for (i = 0; i < list->length; i++){
+    for (i = 0; i < list->length; i++) {
         Cell* cell = arrayList_get(list, i);
 
         switch (cell->type)
@@ -88,8 +95,9 @@ void print_actions(GameStates* gs, MLV_Font* font){
                 break;
                 
             case MONSTER:
-                print_instruction('A', "Attack monster", font, i);
-                print_instruction('M', "Attack monster with magic", font, i + 1);
+                print_instruction('P', "Set physical attack", font, i);
+                print_instruction('M', "Set magical attack", font, i + 1);
+                print_instruction('A', "Attack monster", font, i + 2);
                 break;
             
             default:
@@ -130,6 +138,8 @@ static void draw_items(GameStates* gs){
     for (j = 0; j < 3; j++){
         for (i = 0; i < 4; i++){
             Item* item = player->inventory.items[i + j * 4];
+
+            MLV_draw_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_BLACK);
 
             if (item == NULL) continue;
 
@@ -235,6 +245,11 @@ static void draw_inventory(GameStates* gs, MLV_Font* font){
     draw_button(&gs->inventory.throw, font);
 }
 
+static void draw_attack_icon(int x, int y, int width, int height, AttackType type) {
+    if (type == PHYSICAL) MLV_draw_filled_rectangle(x, y, width, height, MLV_COLOR_RED);
+    else if (type == MAGICAL) MLV_draw_filled_rectangle(x, y, width, height, MLV_COLOR_BLUE);
+}
+
 
 
 void draw_interface(GameStates* gs, View* view) {
@@ -244,6 +259,8 @@ void draw_interface(GameStates* gs, View* view) {
 
     draw_bar(15, 15, 400, 50, MLV_COLOR_GREEN1, player->hp, hp_max);
     draw_bar(15, 80, 400, 50, MLV_COLOR_CYAN3, player->mp, mp_max);
+
+    draw_attack_icon(430, 15, 50, 50, player->attackType);
     
     print_floor(gs->current_stage, view->font);
     print_actions(gs, view->font);

@@ -18,7 +18,12 @@
 */
 
 typedef struct {
-    Potion* potions[NB_POTIONS];
+    Potion* regeneration;
+    Potion* accuracy;
+    Potion* experience;
+    Equipment* weapon;
+    Equipment* magic_wand;
+    Equipment* armor;
 } Bonus;
 
 typedef struct {
@@ -26,7 +31,13 @@ typedef struct {
     double y;
 } Vector;
 
+typedef enum {
+    PHYSICAL, MAGICAL
+} AttackType;
+
 typedef struct {
+    AttackType attackType;
+
     int hp;
     int mp;
     int atk;
@@ -37,8 +48,8 @@ typedef struct {
     int crit;
     Inventory inventory;
     Bonus bonus;
-    Vector position;
 
+    Vector position;
     Vector direction;
     Vector plane;
 } Player;
@@ -67,6 +78,38 @@ int get_hp_player(Player* self);
 int get_mp_player(Player* self);
 
 /**
+ * @brief Get the atk object
+ * 
+ * @param self 
+ * @return int 
+ */
+int get_atk(Player* self);
+
+/**
+ * @brief Get the def object
+ * 
+ * @param self 
+ * @return int 
+ */
+int get_def(Player* self);
+
+/**
+ * @brief Get the intel object
+ * 
+ * @param self 
+ * @return int 
+ */
+int get_intel(Player* self);
+
+/**
+ * @brief Get the crit object
+ * 
+ * @param self 
+ * @return int 
+ */
+int get_crit(Player* self);
+
+/**
  * @brief Effectue une attaque physique
  * 
  * @param self 
@@ -81,6 +124,23 @@ void physical_attack(Player* self, Monster* monster);
  * @param monster 
  */
 void magical_attack(Player* self, Monster* monster);
+
+/**
+ * @brief Effectue une attaque en fonction du type selectionné
+ * 
+ * @param self 
+ * @param monster
+ * @return bool
+ */
+bool attack_monster(Player* self, Monster* monster);
+
+/**
+ * @brief Effectue une attaque sur le player
+ * 
+ * @param monster 
+ * @param player 
+ */
+void attack_player(Monster* monster, Player* player);
 
 /**
  * @brief Renvoie si le joueur à réussie à se déplacer dans la direction (dx, dy)

@@ -5,6 +5,7 @@
 #include "Core/Events.h"
 #include "Core/Action.h"
 #include "Entity/Player.h"
+#include "Entity/Monster.h"
 #include "Map/Map.h"
 #include "Interface/graphics.h"
 #include "Interface/raycastingGraphics.h"
@@ -44,9 +45,14 @@ static bool update_player_movement(GameStates* gs, Events* events) {
 
     bool moved = try_move(player, map, dx, dy);
 
-    #if DEBUG
-        if (moved) update_path_to_stair(gs);
-    #endif
+    if (moved) {
+        #if DEBUG
+            update_path_to_stair(gs);
+        #endif
+        
+        gs->end_turn = true;
+    }
+    
     return moved;
 }
 
@@ -82,7 +88,12 @@ static bool update_player_movement_3d(GameStates* gs, Events* events) {
             break;
     }
 
-    return try_move(player, map, dx, dy);
+    bool moved = try_move(player, map, dx, dy);
+
+    if (moved) {
+        gs->end_turn = true;
+    }
+    return moved;
 }
 
 static bool update_action_from_player_movement(GameStates* gs, Events* events, Action* action) {
@@ -120,13 +131,13 @@ static bool update_action_from_player_movement(GameStates* gs, Events* events, A
     if (cell->type == TREASURE && cell->treasure.state == CLOSE) {
         action->type = OPEN_TREASURE;
         action->cell = cell;
-        fprintf(stderr, "TREASURE");
+        fprintf(stderr, "TREASURE\n");
         return true;
     }
     else if (cell->type == MONSTER) {
         action->type = FIGHT_MONSTER;
         action->cell = cell;
-        fprintf(stderr, "MONSTER");
+        fprintf(stderr, "MONSTER\n");
         return true;
     }
     return false;
@@ -191,7 +202,9 @@ static bool update_action_from_input(GameStates* gs, Events* events, Action* act
     Player* player = get_player(gs);
     Map* map = get_current_map(gs);
 
+    Cell* player_cell;
     Cell* cell;
+    ArrayList* cells = NULL;
 
     switch (events->key) {
         case MLV_KEYBOARD_e:
@@ -205,11 +218,54 @@ static bool update_action_from_input(GameStates* gs, Events* events, Action* act
         case MLV_KEYBOARD_c:
             gs->viewType = gs->viewType == DEFAULT ? RAYCASTING : DEFAULT;
             return true;
+        case MLV_KEYBOARD_t:
+            player_cell = get_cell(map, player->position.x, player->position.y);
+            cells = find_neighbors(map, player_cell, TREASURE);    
+            if (cells->length == 0) break;
+
+            action->type = OPEN_TREASURE;
+            action->cell = arrayList_get(cells, 0);
+
+            arrayList_free(cells, NULL);
+            return true;
+        case MLV_KEYBOARD_a:
+            player_cell = get_cell(map, player->position.x, player->position.y);
+            cells = find_neighbors(map, player_cell, MONSTER);
+            if (cells->length == 0) break;
+
+            action->type = FIGHT_MONSTER;
+            action->cell = arrayList_get(cells, 0);
+
+            arrayList_free(cells, NULL);
+            return true;
+        case MLV_KEYBOARD_p:
+            player->attackType = PHYSICAL;
+            return true;
+        case MLV_KEYBOARD_m:
+            player->attackType = MAGICAL;
+            return true;
         default:
             break;
     }
 
+    if (cells != NULL) arrayList_free(cells, NULL);
     return false;
+}
+
+static void end_turn(GameStates* gs) {
+    Map* map = get_current_map(gs);
+    Player *p = get_player(gs);
+    Cell* cell = get_cell(map, p->position.x, p->position.y);
+
+    ArrayList* monsters = find_neighbors(map, cell, MONSTER);
+
+    int i;
+    for (i = 0; i < monsters->length; i++) {
+        Monster* monster = &((Cell*)arrayList_get(monsters, i))->monster;
+        attack_player(monster, p);
+    }
+
+    arrayList_free(monsters, NULL);
 }
 
 void update(GameStates* gs, Events* events) {
@@ -223,6 +279,11 @@ void update(GameStates* gs, Events* events) {
         
     apply_action(action, gs);
     action_free(action);
+
+    if (gs->end_turn) {
+        end_turn(gs);
+        gs->end_turn = false;
+    }
 }
 
 void draw(GameStates* gs, View* view) {

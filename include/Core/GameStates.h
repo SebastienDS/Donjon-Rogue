@@ -39,6 +39,8 @@ typedef struct GameStates {
     int current_stage;
     Player player;
 
+    bool end_turn;
+
     Inventory_ inventory;
 
     LinkedList* path_to_stair; /* LinkedList<PathPosition> */

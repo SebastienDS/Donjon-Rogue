@@ -24,7 +24,7 @@ void potion_free(Potion* potion) {
 Potion* get_random_potion(int difficulty) {
     int random = randrange(1, 5);  /* ACCURACY, EXPERIENCE, HEALTH, MAGIC, REGENERATION */
 
-    Potion* potion;
+    Potion* potion = NULL;
 
     switch (random)
     {
@@ -61,6 +61,8 @@ Potion* get_random_potion(int difficulty) {
         break;
     
     default:
+        fprintf(stderr, "Invalid Potion type index\n");
+        exit(1);
         break;
     }
 

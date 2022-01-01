@@ -1,7 +1,8 @@
 #ifndef __REGENERATION__
 #define __REGENERATION__
 
-typedef struct {
+
+typedef struct Regeneration{
     int hp;
     int mp;
     int interval;

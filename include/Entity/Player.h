@@ -1,21 +1,11 @@
 #ifndef __PLAYER__
 #define __PLAYER__
 
-#include "Entity/Inventory/Potions/Potion.h"
 #include "Entity/Inventory/Inventory.h"
 #include "Entity/Monster.h"
 #include "Map/Map.h"
+#include "Entity/Inventory/Potions/Potion.h"
 
-#define NB_POTIONS 3
-#define REGENERATION_INDEX 0
-#define ACCURACY_INDEX 1
-#define EXPERIENCE_INDEX 2
-
-/* 
-    [0] -> regeneration 
-    [1] -> accuracy
-    [2] -> experience
-*/
 
 typedef struct {
     Potion* regeneration;
@@ -35,7 +25,7 @@ typedef enum {
     PHYSICAL, MAGICAL
 } AttackType;
 
-typedef struct {
+typedef struct Player{
     AttackType attackType;
 
     int hp;
@@ -161,6 +151,13 @@ bool try_move(Player* player, Map* map, int dx, int dy);
  * @param radians 
  */
 void rotate_player(Player* self, double radians);
+
+/**
+ * @brief Applique les effets des potions
+ * 
+ * @param player 
+ */
+void update_bonus(Player* player);
 
 
 #endif

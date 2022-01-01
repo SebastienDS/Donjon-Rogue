@@ -26,6 +26,7 @@ typedef struct {
 
 typedef struct {
     Item* item_selected;
+    int index;
     bool is_open;
     Button equip;
     Button use;

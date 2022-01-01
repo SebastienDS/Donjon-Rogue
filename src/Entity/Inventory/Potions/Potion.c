@@ -21,7 +21,7 @@ void potion_free(Potion* potion) {
     free(potion);
 }
 
-Potion* get_random_potion(int difficulty) {
+Potion* get_random_potion() {
     int random = randrange(1, 5);  /* ACCURACY, EXPERIENCE, HEALTH, MAGIC, REGENERATION */
 
     Potion* potion = NULL;
@@ -41,11 +41,11 @@ Potion* get_random_potion(int difficulty) {
     case 3:
         /* REGENERATION */
         potion = potion_new(REGENERATION);
-        potion->regeration.hp = 20;
-        potion->regeration.mp = 10;
-        potion->regeration.interval = 3;
-        potion->regeration.countdown = potion->regeration.interval;
-        potion->regeration.duration = 30;
+        potion->regeneration.hp = 20;
+        potion->regeneration.mp = 10;
+        potion->regeneration.interval = 3;
+        potion->regeneration.countdown = 0;
+        potion->regeneration.duration = 30;
         break;
     case 4:
         /* ACCURACY */
@@ -68,3 +68,4 @@ Potion* get_random_potion(int difficulty) {
 
     return potion;
 }
+

@@ -76,7 +76,7 @@ static void print_instruction(char key, char* text, MLV_Font* font, int y){
 
 void print_actions(GameStates* gs, MLV_Font* font){
     ArrayList* list = arrayList_new();
-    int i;
+    int i, cpt = 0;
 
     get_possible_action(gs, list);
 
@@ -87,17 +87,22 @@ void print_actions(GameStates* gs, MLV_Font* font){
         {
             case STAIR_UP:
             case STAIR_DOWN:
-                print_instruction('E', "Use stair", font, i);
+                print_instruction('E', "Use stair", font, cpt);
+                cpt++;
                 break;
 
             case TREASURE:  
-                print_instruction('T', "Open treasure", font, i);
+                print_instruction('T', "Open treasure", font, cpt);
+                cpt++;
                 break;
                 
             case MONSTER:
-                print_instruction('P', "Set physical attack", font, i);
-                print_instruction('M', "Set magical attack", font, i + 1);
-                print_instruction('A', "Attack monster", font, i + 2);
+                print_instruction('P', "Set physical attack", font, cpt);
+                cpt++;
+                print_instruction('M', "Set magical attack", font, cpt);
+                cpt++;
+                print_instruction('A', "Attack monster", font, cpt);
+                cpt++;
                 break;
             
             default:
@@ -176,7 +181,7 @@ static void draw_stat_potion(Potion* potion, MLV_Font* font){
         sprintf(str, "Magic potion\nMP : %d", potion->magic.mp);
         break;
     case REGENERATION:
-        sprintf(str, "Regeneration potion\nHP : %d\nMP : %d\nDuration : %d\nInterval : %d", potion->regeration.hp, potion->regeration.mp, potion->regeration.duration, potion->regeration.interval);
+        sprintf(str, "Regeneration potion\nHP : %d\nMP : %d\nDuration : %d\nInterval : %d", potion->regeneration.hp, potion->regeneration.mp, potion->regeneration.duration, potion->regeneration.interval);
         break;
     default:
         break;

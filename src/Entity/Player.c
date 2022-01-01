@@ -6,6 +6,7 @@
 #include "Entity/Player.h"
 #include "Entity/Monster.h"
 #include "Entity/Inventory/Inventory.h"
+#include "Entity/Inventory/Potions/potionEffect.h"
 #include "Map/Map.h"
 #include "Util/random.h"
 #include "constants.h"
@@ -43,6 +44,17 @@ void init_player(Player* self, int x, int y) {
     self->mp = get_mp_player(self);
 
     init_inventory(&self->inventory);
+    self->inventory.items[0] = get_random_item(1);
+    self->inventory.items[2] = get_random_item(1);
+    self->inventory.items[3] = get_random_item(1);
+    self->inventory.items[4] = get_random_item(1);
+    self->inventory.items[5] = get_random_item(1);
+    self->inventory.items[6] = get_random_item(1);
+    self->inventory.items[7] = get_random_item(1);
+    self->inventory.items[8] = get_random_item(1);
+    self->inventory.items[9] = get_random_item(1);
+    self->inventory.items[10] = get_random_item(1);
+    self->inventory.items[11] = get_random_item(1);
 }
 
 int get_hp_player(Player* self){
@@ -153,4 +165,40 @@ void rotate_player(Player* self, double radians) {
     oldPlaneX = self->plane.x;
     self->plane.x = self->plane.x * cos(-radians) - self->plane.y * sin(radians);
     self->plane.y = oldPlaneX * sin(radians) + self->plane.y * cos(radians);
+}
+
+static void update_bonus_accuracy(Player* player){
+    if (player->bonus.accuracy != NULL){
+        bool consumed = apply_potion_accuracy(player->bonus.accuracy, player);
+        if (consumed){
+            potion_free(player->bonus.accuracy);
+            player->bonus.accuracy = NULL;
+        }
+    }
+}
+
+static void update_bonus_experience(Player* player){
+    if (player->bonus.experience != NULL){
+        bool consumed = apply_potion_experience(player->bonus.experience, player);
+        if (consumed){
+            potion_free(player->bonus.experience);
+            player->bonus.experience = NULL;
+        }
+    }
+}
+
+static void update_bonus_regeneration(Player* player){
+    if (player->bonus.regeneration != NULL){
+        bool consumed = apply_potion_regeneration(player->bonus.regeneration, player);
+        if (consumed){
+            potion_free(player->bonus.regeneration);
+            player->bonus.regeneration = NULL;
+        }
+    }
+}
+
+void update_bonus(Player* player){
+    update_bonus_accuracy(player);
+    update_bonus_experience(player);
+    update_bonus_regeneration(player);
 }

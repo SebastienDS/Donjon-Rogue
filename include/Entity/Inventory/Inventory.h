@@ -18,7 +18,7 @@ typedef struct {
     };
 } Item;
 
-typedef struct {
+typedef struct Inventory{
     Item* items[NB_ITEMS];
 } Inventory;
 

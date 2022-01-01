@@ -152,6 +152,7 @@ static bool verif_click_item_inventory(int x, int y){
     static int start_x = SCREEN_WIDTH * 3 / 5 + 15;
     static int start_y = 30;
     static int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
+
     int width = width_items * 4;
     int height = width_items * 3;
 
@@ -168,6 +169,7 @@ static void get_item_selected(GameStates* gs, int x, int y){
     int j = (y - start_y) / width_items;
     
     gs->inventory.item_selected = get_player(gs)->inventory.items[i + j * 4];
+    gs->inventory.index = i + j * 4;
 }
 
 static bool update_action_from_mouse(GameStates* gs, Events* events, Action* action) {
@@ -266,6 +268,7 @@ static void end_turn(GameStates* gs) {
     }
 
     arrayList_free(monsters, NULL);
+    update_bonus(p);
 }
 
 void update(GameStates* gs, Events* events) {

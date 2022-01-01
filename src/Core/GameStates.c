@@ -9,12 +9,22 @@
 #include "Util/PathFinding/Astar.h"
 #include "constants.h"
 
+#include "Entity/Inventory/Potions/potionEffect.h"
+
 static void equip_callback(GameStates* gs){
     printf("Equip\n");
 }
 
 static void use_callback(GameStates* gs){
-    printf("Use\n");
+    Player* player = get_player(gs);
+    bool used = use_potion(gs->inventory.item_selected->potion, player);
+
+    if (used){
+        gs->inventory.item_selected->potion = NULL;
+        item_free(gs->inventory.item_selected);
+        gs->inventory.item_selected = NULL;
+        player->inventory.items[gs->inventory.index] = NULL;
+    }
 }
 
 static void throw_callback(GameStates* gs){
@@ -47,6 +57,7 @@ void init_game_states(GameStates* gs) {
     
     gs->inventory.is_open = false;
     gs->inventory.item_selected = NULL;
+    gs->inventory.index = 0;
 
     set_button(&gs->inventory.equip, SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 45 - 50 , (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "EQUIP", equip_callback); 
     set_button(&gs->inventory.use, SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 45 - 50, (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "USE", use_callback); 

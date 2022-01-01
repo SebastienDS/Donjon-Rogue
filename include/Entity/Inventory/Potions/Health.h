@@ -1,8 +1,9 @@
 #ifndef __HEALTH__
 #define __HEALTH__
 
-typedef struct {
+typedef struct Health{
     int hp;
 } Health;
+
 
 #endif

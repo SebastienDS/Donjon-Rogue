@@ -1,6 +1,7 @@
 #ifndef __POTION__
 #define __POTION__
 
+
 #include "Entity/Inventory/Potions/Accuracy.h"
 #include "Entity/Inventory/Potions/Experience.h"
 #include "Entity/Inventory/Potions/Health.h"
@@ -11,14 +12,14 @@ typedef enum {
     ACCURACY, EXPERIENCE, HEALTH, MAGIC, REGENERATION
 } PotionType;
 
-typedef struct {
+typedef struct Potion{
     PotionType type;
     union {
         Accuracy accuracy;
         Experience experience;
         Health health;
         Magic magic;
-        Regeneration regeration;
+        Regeneration regeneration;
     };
 } Potion;
 
@@ -40,10 +41,10 @@ void potion_free(Potion* potion);
 
 /**
  * @brief Renvoie une potion aléatoire
- * 
- * @param difficulty 
+ *  
  * @return Potion* 
  */
-Potion* get_random_potion(int difficulty);
+Potion* get_random_potion();
+
 
 #endif

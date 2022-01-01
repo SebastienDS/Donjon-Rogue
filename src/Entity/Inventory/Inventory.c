@@ -41,7 +41,7 @@ Item* get_random_item(int difficulty) {
     Item* item = item_new(type);
 
     if (type == POTION) {
-        item->potion = get_random_potion(difficulty);
+        item->potion = get_random_potion();
     } else if (type == EQUIPMENT) {
         item->equipment = get_random_equipment(difficulty);
     }

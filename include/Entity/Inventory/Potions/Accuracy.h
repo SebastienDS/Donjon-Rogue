@@ -1,9 +1,11 @@
 #ifndef __ACCURACY__
 #define __ACCURACY__
 
-typedef struct {
+
+typedef struct Accuracy {
     int crit;
     int duration;
 } Accuracy;
+
 
 #endif

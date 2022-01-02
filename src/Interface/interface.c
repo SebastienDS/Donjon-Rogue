@@ -112,28 +112,58 @@ void print_actions(GameStates* gs, MLV_Font* font){
     arrayList_free(list, NULL);
 }
 
-static void get_type_equipment(Equipment* equipment, int i, int j){
+static void get_type_equipment(Player* player, Equipment* equipment, int i, int j, Inventory_icones* icones){
     static int start_x = SCREEN_WIDTH * 3 / 5 + 15;
     static int start_y = 30;
     static int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
 
     switch (equipment->type)
     {
-    case WEAPON:
-        MLV_draw_filled_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_BLUE);
+    case WEAPON:      
+        if (player->bonus.weapon == equipment){
+            MLV_draw_filled_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_GREEN);
+        }
+
+        MLV_draw_image(icones->sword, start_x + (i * width_items), start_y + (j * width_items));
         break;
     case ARMOR:
-        MLV_draw_filled_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_GREEN);
+        if (player->bonus.armor == equipment){
+            MLV_draw_filled_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_GREEN);
+        }
+
+        MLV_draw_image(icones->armor, start_x + (i * width_items), start_y + (j * width_items));
         break;
-    case MAGICWAND:
-        MLV_draw_filled_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_RED);
+    case MAGICWAND:        
+        if (player->bonus.magic_wand == equipment){
+            MLV_draw_filled_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_GREEN);
+        }
+
+        MLV_draw_image(icones->magic_wand, start_x + (i * width_items), start_y + (j * width_items));
         break;
     default:
         break;
     }
 }
 
-static void draw_items(GameStates* gs){
+static void get_type_potion(Player* player, Potion* potion, int i, int j, Inventory_icones* icones){
+    static int start_x = SCREEN_WIDTH * 3 / 5 + 15;
+    static int start_y = 30;
+    static int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
+
+    switch (potion->type)
+    {
+    case HEALTH:
+    case MAGIC:
+        MLV_draw_image(icones->instant_potion, start_x + (i * width_items), start_y + (j * width_items));
+        break;
+
+    default:
+        MLV_draw_image(icones->potion, start_x + (i * width_items), start_y + (j * width_items));
+        break;
+    }
+}
+
+static void draw_items(GameStates* gs, Inventory_icones* icones){
     int i, j;
     static int start_x = SCREEN_WIDTH * 3 / 5 + 15;
     static int start_y = 30;
@@ -151,10 +181,10 @@ static void draw_items(GameStates* gs){
             switch (item->type)
             {
             case EQUIPMENT:
-                get_type_equipment(item->equipment, i, j);
+                get_type_equipment(player, item->equipment, i, j, icones);
                 break;
             case POTION:
-                MLV_draw_filled_rectangle(start_x + (i * width_items), start_y + (j * width_items), width_items, width_items, MLV_COLOR_YELLOW);
+                get_type_potion(player, item->potion, i, j, icones);
                 break;
             default:
                 break;
@@ -162,6 +192,8 @@ static void draw_items(GameStates* gs){
         }
     }
 }
+
+
 
 static void draw_stat_potion(Potion* potion, MLV_Font* font){
     char str[255];
@@ -233,26 +265,29 @@ static void draw_button(Button* button, MLV_Font* font){
 
 }
 
-static void draw_inventory(GameStates* gs, MLV_Font* font){
+static void draw_inventory(GameStates* gs, View* view){
     Item* item = gs->inventory.item_selected;
+    Player* player = get_player(gs);
 
     MLV_draw_filled_rectangle(SCREEN_WIDTH * 3 / 5, 15, SCREEN_WIDTH * 2 / 5 - 15, SCREEN_HEIGHT - 30, MLV_COLOR_GRAY);
-    draw_items(gs);
+    draw_items(gs, &view->inventory_icones);
+
     if (item == NULL) return;
 
-    draw_stats(gs, item, font);
-    if (item->type == EQUIPMENT){
-        draw_button(&gs->inventory.equip, font);
+    draw_stats(gs, item, view->font);
+    if (item->type == POTION){
+        draw_button(&gs->inventory.use, view->font);
     }
-    else{
-        draw_button(&gs->inventory.use, font);
-    }
-    draw_button(&gs->inventory.throw, font);
+
+    if (verif_equiped(player, item)) return;
+
+    draw_button(&gs->inventory.throw, view->font
+    );
 }
 
-static void draw_attack_icon(int x, int y, int width, int height, AttackType type) {
-    if (type == PHYSICAL) MLV_draw_filled_rectangle(x, y, width, height, MLV_COLOR_RED);
-    else if (type == MAGICAL) MLV_draw_filled_rectangle(x, y, width, height, MLV_COLOR_BLUE);
+static void draw_attack_icon(int x, int y, AttackType type, View* view) {
+    if (type == PHYSICAL) MLV_draw_image(view->inventory_icones.sword_mode, x, y);
+    else if (type == MAGICAL)  MLV_draw_image(view->inventory_icones.magic_wand_mode, x, y);
 }
 
 
@@ -265,12 +300,12 @@ void draw_interface(GameStates* gs, View* view) {
     draw_bar(15, 15, 400, 50, MLV_COLOR_GREEN1, player->hp, hp_max);
     draw_bar(15, 80, 400, 50, MLV_COLOR_CYAN3, player->mp, mp_max);
 
-    draw_attack_icon(430, 15, 50, 50, player->attackType);
+    draw_attack_icon(430, 15, player->attackType, view);
     
     print_floor(gs->current_stage, view->font);
     print_actions(gs, view->font);
 
-    if (gs->inventory.is_open) draw_inventory(gs, view->font);
+    if (gs->inventory.is_open) draw_inventory(gs, view);
 }
 
 

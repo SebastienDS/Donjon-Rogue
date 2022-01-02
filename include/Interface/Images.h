@@ -18,6 +18,16 @@ typedef struct {
     MLV_Image* wall;
 } Images;
 
+/**
+ * @brief Charge les images
+ * 
+ * @param filename 
+ * @param width 
+ * @param height 
+ * @return MLV_Image* 
+ */
+MLV_Image* load_image(const char* filename, int width, int height);
+
 
 /**
  * @brief Initialise les images

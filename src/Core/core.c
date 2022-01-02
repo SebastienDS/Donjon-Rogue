@@ -176,21 +176,18 @@ static bool update_action_from_mouse(GameStates* gs, Events* events, Action* act
     if (!(events->event == MLV_MOUSE_BUTTON && events->state == MLV_PRESSED)) return false;
     
     Item* item = gs->inventory.item_selected;
+    Player* player = get_player(gs);
 
     if (gs->inventory.is_open) {
         if(verif_click_item_inventory(events->mouseX, events->mouseY)) get_item_selected(gs, events->mouseX, events->mouseY);
 
         if (item == NULL) return false;
 
-        if(item->type == EQUIPMENT && test_click(&gs->inventory.equip, events->mouseX, events->mouseY)) {
-            gs->inventory.equip.callback(gs);  
-            return true; 
-        }
-        else if(item->type == POTION && test_click(&gs->inventory.use, events->mouseX, events->mouseY)) {
+       if(item->type == POTION && test_click(&gs->inventory.use, events->mouseX, events->mouseY)) {
             gs->inventory.use.callback(gs);   
             return true; 
         }
-        else if(test_click(&gs->inventory.throw, events->mouseX, events->mouseY)) {
+        else if(!verif_equiped(player, item) && test_click(&gs->inventory.throw, events->mouseX, events->mouseY)) {
             gs->inventory.throw.callback(gs);   
             return true; 
         }

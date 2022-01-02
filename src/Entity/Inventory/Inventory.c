@@ -26,10 +26,10 @@ Item* item_new(ItemType type) {
 
 void item_free(Item* item) {
     if (item->type == POTION) {
-        free(item->potion);
+        potion_free(item->potion);
     }
     else if (item->type == EQUIPMENT) {
-        free(item->equipment);
+        equipment_free(item->equipment);
     }
     free(item);
 }

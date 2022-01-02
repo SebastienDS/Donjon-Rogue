@@ -3,7 +3,7 @@
 #include "Interface/Images.h"
 
 
-static MLV_Image* load_image(const char* filename, int width, int height) {
+MLV_Image* load_image(const char* filename, int width, int height) {
     MLV_Image* image = MLV_load_image(filename);
     if (image == NULL) {
         fprintf(stderr, "Load image error: cannot load image %s\n", filename);
@@ -22,7 +22,7 @@ void init_images(Images* img, int size) {
     img->player = load_image("resources/images/player/wizzard_m_idle_anim_f0.png", size, size);
     img->stair = load_image("resources/images/floor_ladder.png", size, size);
     img->floor = load_image("resources/images/floor/floor_1.png", size, size);
-    img->wall = load_image("resources/images/wall/wall_mid.png", size, size);
+    img->wall = load_image("resources/images/wall/wall_mid.png", size, size);    
 }
 
 

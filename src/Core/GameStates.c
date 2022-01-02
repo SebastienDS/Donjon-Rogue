@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "Core/GameStates.h"
+#include "Entity/Player.h"
 #include "Map/Map.h"
 #include "Util/ArrayList.h"
 #include "Util/Element.h"
@@ -10,10 +11,6 @@
 #include "constants.h"
 
 #include "Entity/Inventory/Potions/potionEffect.h"
-
-static void equip_callback(GameStates* gs){
-    printf("Equip\n");
-}
 
 static void use_callback(GameStates* gs){
     Player* player = get_player(gs);
@@ -28,7 +25,13 @@ static void use_callback(GameStates* gs){
 }
 
 static void throw_callback(GameStates* gs){
-    printf("Throw\n");
+    Player* player = get_player(gs);
+
+    if(verif_equiped(player, gs->inventory.item_selected)) return;
+    
+    item_free(gs->inventory.item_selected);
+    gs->inventory.item_selected = NULL;
+    player->inventory.items[gs->inventory.index] = NULL;
 }
 
 static bool is_walkable_func(Element* grid, int i, int j) {
@@ -59,7 +62,6 @@ void init_game_states(GameStates* gs) {
     gs->inventory.item_selected = NULL;
     gs->inventory.index = 0;
 
-    set_button(&gs->inventory.equip, SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 45 - 50 , (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "EQUIP", equip_callback); 
     set_button(&gs->inventory.use, SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 45 - 50, (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "USE", use_callback); 
     set_button(&gs->inventory.throw, SCREEN_WIDTH - ((SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30) - 30, SCREEN_HEIGHT - 45 - 50, (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "THROW", throw_callback); 
 

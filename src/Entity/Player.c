@@ -55,6 +55,8 @@ void init_player(Player* self, int x, int y) {
     self->inventory.items[9] = get_random_item(1);
     self->inventory.items[10] = get_random_item(1);
     self->inventory.items[11] = get_random_item(1);
+
+    auto_equip(self);
 }
 
 int get_hp_player(Player* self){
@@ -201,4 +203,61 @@ void update_bonus(Player* player){
     update_bonus_accuracy(player);
     update_bonus_experience(player);
     update_bonus_regeneration(player);
+}
+
+void auto_equip(Player* player){
+    int i;
+
+    for (i = 0; i < NB_ITEMS; i++){
+        Item* item = player->inventory.items[i];
+
+        if (item == NULL || item->type != EQUIPMENT) continue;
+
+        Equipment* equipment = item->equipment;
+
+        switch (equipment->type)
+        {
+        case WEAPON:
+            if (player->bonus.weapon == NULL || equipment->weapon.quality >= player->bonus.weapon->weapon.quality){
+                player->bonus.weapon = equipment;
+            }
+            break;
+
+        case ARMOR:
+            if (player->bonus.armor == NULL || equipment->armor.quality >= player->bonus.armor->armor.quality){
+                player->bonus.armor = equipment;
+            }
+            break;
+        
+        case MAGICWAND:
+            if (player->bonus.magic_wand == NULL || equipment->magic_wand.quality >= player->bonus.magic_wand->magic_wand.quality){
+                player->bonus.magic_wand = equipment;
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+bool verif_equiped(Player* player, Item* item){
+    if (item == NULL || item->type != EQUIPMENT) return false;
+
+    Equipment* equipment = item->equipment;
+
+    switch (equipment->type)
+    {
+        case WEAPON:
+            return player->bonus.weapon == equipment;
+        
+        case ARMOR:
+            return player->bonus.armor == equipment;
+        
+        case MAGICWAND:
+            return player->bonus.magic_wand == equipment;
+
+        default:
+            return false;
+    }
 }

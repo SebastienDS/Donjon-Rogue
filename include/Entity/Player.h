@@ -159,5 +159,23 @@ void rotate_player(Player* self, double radians);
  */
 void update_bonus(Player* player);
 
+/**
+ * @brief Permet d'équiper automatiquement un équipement au joueur
+ * 
+ * @param player 
+ */
+void auto_equip(Player* player);
+
+/**
+ * @brief Vérifie si un équipement est équipé
+ * 
+ * @param player 
+ * @param item 
+ * @return true 
+ * @return false 
+ */
+bool verif_equiped(Player* player, Item* item);
+
+
 
 #endif

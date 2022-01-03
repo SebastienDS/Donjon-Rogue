@@ -1,6 +1,7 @@
 #include "Core/Action.h"
 #include "Core/GameStates.h"
 #include "Entity/Monster.h"
+#include "Entity/Player.h"
 #include "Map/Map.h"
 
 #include <stdio.h>
@@ -19,8 +20,9 @@ Action* action_new(void){
     return action;
 }
 
-static void remove_if_dead(Cell* cell){
+static void remove_if_dead(Cell* cell, Player* player){
     if (is_dead(&cell->monster)){
+        gain_experience(player, cell->monster.exp_given);
         cell->type = ROOM;
     }
 }
@@ -38,7 +40,7 @@ void apply_action(Action* action, GameStates* gs) {
             attack_succeed = attack_monster(get_player(gs), &action->cell->monster);
             if (attack_succeed) {
                 printf("hp : %d \n", action->cell->monster.hp);
-                remove_if_dead(action->cell);
+                remove_if_dead(action->cell, get_player(gs));
                 
                 gs->end_turn = true;
             } else {

@@ -36,6 +36,15 @@ void print_floor(int floor, MLV_Font* font){
     MLV_draw_text_with_font(SCREEN_WIDTH - width - 15, 15, str, font, MLV_COLOR_WHITE_SMOKE);
 }
 
+static void print_level(int level) {
+    char str[50];
+    int width, height;
+
+    sprintf(str, "%d", level);
+    MLV_get_size_of_text(str, &width, &height);
+    MLV_draw_text((SCREEN_WIDTH - width) / 2, (SCREEN_HEIGHT - CELL_SIZE - height) / 2 - 10, str, MLV_COLOR_WHITE_SMOKE);
+}
+
 static void get_possible_action(GameStates* gs, ArrayList* list) {
     static const int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
@@ -281,8 +290,7 @@ static void draw_inventory(GameStates* gs, View* view){
 
     if (verif_equiped(player, item)) return;
 
-    draw_button(&gs->inventory.throw, view->font
-    );
+    draw_button(&gs->inventory.throw, view->font);
 }
 
 static void draw_attack_icon(int x, int y, AttackType type, View* view) {
@@ -290,6 +298,27 @@ static void draw_attack_icon(int x, int y, AttackType type, View* view) {
     else if (type == MAGICAL)  MLV_draw_image(view->inventory_icones.magic_wand_mode, x, y);
 }
 
+static void print_skill(int x, int y, char* text, int value, MLV_Font* font, int cpt) {
+    char str[50];
+    int width, height;
+
+    sprintf(str, "%s - %d", text, value);
+    MLV_get_size_of_text_with_font(str, &width, &height, font);
+    MLV_draw_text_with_font(x, y + cpt * height, str, font, MLV_COLOR_WHITE_SMOKE);
+}
+    
+static void draw_skills(SkillsUpgrades* btns, int x, int y, Player* player, MLV_Font* font) {
+    print_skill(x, y, "Atk", player->atk, font, 0);
+    print_skill(x, y, "Int", player->intel, font, 1);
+    print_skill(x, y, "Def", player->def, font, 2);
+
+    if (!player->skill_points) return;
+
+    draw_button(&btns->atk, font);
+    draw_button(&btns->intel, font);
+    draw_button(&btns->def, font);
+
+}
 
 
 void draw_interface(GameStates* gs, View* view) {
@@ -299,9 +328,12 @@ void draw_interface(GameStates* gs, View* view) {
 
     draw_bar(15, 15, 400, 50, MLV_COLOR_GREEN1, player->hp, hp_max);
     draw_bar(15, 80, 400, 50, MLV_COLOR_CYAN3, player->mp, mp_max);
+    draw_bar(15, 145, 400, 25, MLV_COLOR_GRAY, player->exp, required_experience(player->lvl));
 
     draw_attack_icon(430, 15, player->attackType, view);
+    draw_skills(&gs->skills_btn, 15, 185, player, view->medium_font);
     
+    print_level(player->lvl);
     print_floor(gs->current_stage, view->font);
     print_actions(gs, view->font);
 

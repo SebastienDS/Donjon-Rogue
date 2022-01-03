@@ -26,7 +26,6 @@ int main(void) {
     init_view(&view);
     init_game_states(&gs);
 
-    MLV_change_frame_rate(40);
 
     while (true) {
         events.event = MLV_get_event(&events.key, NULL, NULL, NULL, NULL, &events.mouseX, &events.mouseY, NULL, &events.state);
@@ -34,8 +33,6 @@ int main(void) {
         update(&gs, &events);
         draw(&gs, &view);
         MLV_actualise_window();
-
-        MLV_delay_according_to_frame_rate();
     }
 
     destroy_view(&view);

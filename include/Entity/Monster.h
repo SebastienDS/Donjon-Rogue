@@ -8,6 +8,7 @@ typedef struct {
     int hp;
     int atk;
     int crit;
+    int exp_given;
 } Monster;
 
 /**
@@ -15,7 +16,7 @@ typedef struct {
  * 
  * @param monster 
  */
-void init_monster(Monster* monster);
+void init_monster(Monster* monster, int difficulty, int exp_given);
 
 /**
  * @brief Renvoie true si le monstre est mort

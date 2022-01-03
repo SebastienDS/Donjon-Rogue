@@ -33,6 +33,12 @@ typedef struct {
     Button throw;
 } Inventory_;
 
+typedef struct {
+    Button atk;
+    Button intel;
+    Button def;
+} SkillsUpgrades;
+
 typedef struct GameStates {
     ViewType viewType;
 
@@ -43,6 +49,7 @@ typedef struct GameStates {
     bool end_turn;
 
     Inventory_ inventory;
+    SkillsUpgrades skills_btn;
 
     LinkedList* path_to_stair; /* LinkedList<PathPosition> */
 } GameStates;

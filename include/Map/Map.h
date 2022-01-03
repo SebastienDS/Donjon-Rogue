@@ -81,8 +81,10 @@ bool is_at_the_border(int x, int y);
  * @brief Génère un étage aléatoire 
  * 
  * @param map 
+ * @param difficulty
+ * @param player_level
  */
-void generate_stage(Map* map);
+void generate_stage(Map* map, int difficulty, int player_level);
 
 /**
  * @brief Renvoie si l'on peut marcher sur la cellule (x, y)

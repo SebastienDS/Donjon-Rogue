@@ -20,6 +20,7 @@ typedef struct {
     Images images;
     Images textures;
     MLV_Font* font;
+    MLV_Font* medium_font;
 } View;
 
 

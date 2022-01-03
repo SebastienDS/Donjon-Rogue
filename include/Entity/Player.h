@@ -36,6 +36,9 @@ typedef struct Player{
     int exp;
     int lvl;
     int crit;
+
+    int skill_points;
+    
     Inventory inventory;
     Bonus bonus;
 
@@ -175,6 +178,22 @@ void auto_equip(Player* player);
  * @return false 
  */
 bool verif_equiped(Player* player, Item* item);
+
+/**
+ * @brief Renvoie l'experience requit pour monter de niveau
+ * 
+ * @param level 
+ * @return int 
+ */
+int required_experience(int level);
+
+/**
+ * @brief Augmente l'experience du joueur
+ * 
+ * @param player 
+ * @param exp 
+ */
+void gain_experience(Player* player, int exp);
 
 
 

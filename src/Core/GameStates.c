@@ -34,6 +34,24 @@ static void throw_callback(GameStates* gs){
     player->inventory.items[gs->inventory.index] = NULL;
 }
 
+static void upgrade_atk_callback(GameStates* gs) {
+    Player* player = get_player(gs);
+    player->atk++;
+    player->skill_points--;
+}
+
+static void upgrade_intel_callback(GameStates* gs) {
+    Player* player = get_player(gs);
+    player->intel++;
+    player->skill_points--;
+}
+
+static void upgrade_def_callback(GameStates* gs) {
+    Player* player = get_player(gs);
+    player->def++;
+    player->skill_points--;
+}
+
 static bool is_walkable_func(Element* grid, int i, int j) {
     Map* map = (Map*)grid;
     Cell* cell = get_cell(map, i, j);
@@ -63,12 +81,18 @@ void init_game_states(GameStates* gs) {
     gs->inventory.index = 0;
 
     set_button(&gs->inventory.use, SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 45 - 50, (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "USE", use_callback); 
-    set_button(&gs->inventory.throw, SCREEN_WIDTH - ((SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30) - 30, SCREEN_HEIGHT - 45 - 50, (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "THROW", throw_callback); 
+    set_button(&gs->inventory.throw, SCREEN_WIDTH - ((SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30) - 30, SCREEN_HEIGHT - 45 - 50, (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "THROW", throw_callback);
 
-    Map* map = map_new();
+    set_button(&gs->skills_btn.atk, 150, 185, 25, 25, "+", upgrade_atk_callback);
+    set_button(&gs->skills_btn.intel, 150, 215, 25, 25, "+", upgrade_intel_callback);
+    set_button(&gs->skills_btn.def, 150, 245, 25, 25, "+", upgrade_def_callback);
+
+    Player* p = get_player(gs);
+    init_player(p, START_X, START_Y);
+
+    Map* map = map_new(gs->current_stage, p->lvl);
     arrayList_add(gs->maps, map);
 
-    init_player(get_player(gs), START_X, START_Y);
 
     #if DEBUG
         update_path_to_stair(gs);
@@ -131,7 +155,8 @@ void go_next_stage(GameStates* gs) {
     gs->current_stage++;
 
     if (gs->current_stage > gs->maps->length - 1) {
-        Map* map = map_new();
+        Player* p = get_player(gs);
+        Map* map = map_new(gs->current_stage, p->lvl);
         arrayList_add(gs->maps, map);
     }
 

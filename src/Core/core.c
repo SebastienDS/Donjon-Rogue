@@ -183,12 +183,27 @@ static bool update_action_from_mouse(GameStates* gs, Events* events, Action* act
 
         if (item == NULL) return false;
 
-       if(item->type == POTION && test_click(&gs->inventory.use, events->mouseX, events->mouseY)) {
+        if(item->type == POTION && test_click(&gs->inventory.use, events->mouseX, events->mouseY)) {
             gs->inventory.use.callback(gs);   
             return true; 
         }
         else if(!verif_equiped(player, item) && test_click(&gs->inventory.throw, events->mouseX, events->mouseY)) {
             gs->inventory.throw.callback(gs);   
+            return true; 
+        }
+    }
+
+    if (player->skill_points) {
+        if (test_click(&gs->skills_btn.atk, events->mouseX, events->mouseY)) {
+            gs->skills_btn.atk.callback(gs);   
+            return true; 
+        }
+        else if (test_click(&gs->skills_btn.intel, events->mouseX, events->mouseY)) {
+            gs->skills_btn.intel.callback(gs);   
+            return true; 
+        }
+        else if (test_click(&gs->skills_btn.def, events->mouseX, events->mouseY)) {
+            gs->skills_btn.def.callback(gs);   
             return true; 
         }
     }

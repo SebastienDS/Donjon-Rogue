@@ -8,13 +8,16 @@
 #include "constants.h"
 #include "Entity/Monster.h"
 #include "Entity/Treasure.h"
+#include "Entity/Player.h"
+
+#define LEVEL_PER_STAGE 2
 
 
 Cell* get_cell(Map* map, int x, int y) {
     return &map->map[y][x];
 }
 
-Map* map_new() {
+Map* map_new(int level, int player_level) {
     Map* map = (Map*)malloc(sizeof(Map));
     if (map == NULL) {
         fprintf(stderr, "Map malloc error\n");
@@ -22,7 +25,7 @@ Map* map_new() {
     }
 
     init_map(map);
-    generate_stage(map);
+    generate_stage(map, level, player_level);
 
     return map;
 }
@@ -234,16 +237,18 @@ static void set_treasure(Cell* cell){
 }
 
 
-static void set_monster(Cell* cell){
+static void set_monster(Cell* cell, int difficulty, int exp_given) {
     cell->type = MONSTER;
-    init_monster(&cell->monster);
+    init_monster(&cell->monster, difficulty, exp_given);
 }
 
-static void set_treasures(Map* map){
+static void set_treasures(Map* map, int difficulty, int player_level) {
     int i;
     ArrayList* treasures = arrayList_new();
     
     found_treasures(map, treasures);
+
+    int exp_given = required_experience(player_level + LEVEL_PER_STAGE + 1) * LEVEL_PER_STAGE / treasures->length;
 
     for (i = 0; i < treasures->length; i++) {
         Cell* cell_treasure = arrayList_get(treasures, i);
@@ -254,14 +259,14 @@ static void set_treasures(Map* map){
         }
         
         set_treasure(cell_treasure);
-        set_monster(cell_monster);
+        set_monster(cell_monster, difficulty, exp_given);
     }
 
     arrayList_free(treasures, NULL);
 }
 
-static void set_elements(Map* map){
-    set_treasures(map);
+static void set_elements(Map* map, int difficulty, int player_level) {
+    set_treasures(map, difficulty, player_level);
 
     Cell* upstair = get_cell(map, START_X, START_Y);
     Cell* treasure = select_closest_room(map, upstair);
@@ -282,7 +287,7 @@ static void set_stair_down(Map* map, Cell* stair_up) {
 
             if (cell->type != ROOM) continue;
 
-            if (manhattan_distance(i, j, stair_up->x, stair_up->y)) { /* TODO: distance >= xxxx */
+            if (manhattan_distance(i, j, stair_up->x, stair_up->y) >= 25) {
                 arrayList_add(list, cell);
             }
         }
@@ -299,7 +304,7 @@ static void set_stair_down(Map* map, Cell* stair_up) {
 }
 
 
-void generate_stage(Map* map){
+void generate_stage(Map* map, int difficulty, int player_level) {
     ArrayList* toexpand = arrayList_new();
 
     init_adjacent(map, toexpand);
@@ -307,7 +312,7 @@ void generate_stage(Map* map){
     fill_wall(map); 
     arrayList_free(toexpand, NULL);
 
-    set_elements(map);
+    set_elements(map, difficulty, player_level);
     Cell* cell = get_cell(map, START_X, START_Y);
     cell->type = STAIR_UP;
 

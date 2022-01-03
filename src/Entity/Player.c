@@ -43,6 +43,8 @@ void init_player(Player* self, int x, int y) {
     self->hp = get_hp_player(self); 
     self->mp = get_mp_player(self);
 
+    self->skill_points = 0;
+
     init_inventory(&self->inventory);
     self->inventory.items[0] = get_random_item(1);
     self->inventory.items[2] = get_random_item(1);
@@ -260,4 +262,29 @@ bool verif_equiped(Player* player, Item* item){
         default:
             return false;
     }
+}
+
+int required_experience(int level) {
+    return 350 + 50 * level;
+}
+
+static void verif_level_up(Player* player) {
+    int exp_required = required_experience(player->lvl);
+
+    while (player->exp >= exp_required) {
+        player->exp -= exp_required;
+        player->lvl++;
+
+        player->hp = get_hp_player(player);
+        player->mp = get_mp_player(player);
+        player->skill_points += 3;
+    }
+}
+
+void gain_experience(Player* player, int exp) {
+    int bonus = player->bonus.experience == NULL ? 0 : player->bonus.experience->experience.exp;
+
+    player->exp += exp + exp * bonus / 100.0;
+    verif_level_up(player);
+    printf("Exp: %d lvl: %d \n", player->exp, player->lvl);
 }

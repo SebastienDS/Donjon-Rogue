@@ -34,6 +34,17 @@ static void throw_callback(GameStates* gs){
     player->inventory.items[gs->inventory.index] = NULL;
 }
 
+static void take_callback(GameStates* gs){
+    Player* player = get_player(gs);
+    int index = get_empty_slot(player);
+
+    if (index == -1) return;
+
+    insert_item(player, gs->treasure.item_selected, index);
+    gs->treasure.item_selected = NULL;
+    gs->treasure.treasure->items[gs->treasure.index] = NULL;
+}
+
 static void upgrade_atk_callback(GameStates* gs) {
     Player* player = get_player(gs);
     player->atk++;
@@ -80,8 +91,16 @@ void init_game_states(GameStates* gs) {
     gs->inventory.item_selected = NULL;
     gs->inventory.index = 0;
 
+    gs->treasure.is_open = false;
+    gs->treasure.item_selected = NULL;
+    gs->treasure.index = 0;
+    gs->treasure.treasure = NULL;
+
+
     set_button(&gs->inventory.use, SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 45 - 50, (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "USE", use_callback); 
     set_button(&gs->inventory.throw, SCREEN_WIDTH - ((SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30) - 30, SCREEN_HEIGHT - 45 - 50, (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "THROW", throw_callback);
+
+    set_button(&gs->treasure.take, (SCREEN_WIDTH * 2 / 5 - 15 - ((SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30)) / 2, SCREEN_HEIGHT - 45 - 50, (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "TAKE", take_callback);
 
     set_button(&gs->skills_btn.atk, 150, 185, 25, 25, "+", upgrade_atk_callback);
     set_button(&gs->skills_btn.intel, 150, 215, 25, 25, "+", upgrade_intel_callback);

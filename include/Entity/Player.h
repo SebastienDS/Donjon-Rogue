@@ -195,6 +195,25 @@ int required_experience(int level);
  */
 void gain_experience(Player* player, int exp);
 
+/**
+ * @brief Get the empty slot object
+ * 
+ * @param player 
+ * @return int 
+ */
+int get_empty_slot(Player* player);
+
+/**
+ * @brief Insert un item dans l'inventaire du joueur
+ * 
+ * @param player 
+ * @param item 
+ * @param index 
+ * @return true 
+ * @return false 
+ */
+bool insert_item(Player* player, Item* item, int index);
+
 
 
 #endif

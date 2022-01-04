@@ -288,3 +288,21 @@ void gain_experience(Player* player, int exp) {
     verif_level_up(player);
     printf("Exp: %d lvl: %d \n", player->exp, player->lvl);
 }
+
+int get_empty_slot(Player* player){
+    int i;
+
+    for(i = 0; i < NB_ITEMS; i++){
+        Item* item = player->inventory.items[i];
+
+        if (item == NULL) return i;
+    }
+    return -1;
+}
+
+bool insert_item(Player* player, Item* item, int index){
+    if (player->inventory.items[index] != NULL) return false;
+
+    player->inventory.items[index] = item;
+    return true;
+}

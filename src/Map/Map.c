@@ -31,6 +31,15 @@ Map* map_new(int level, int player_level) {
 }
 
 void map_free(Map* map) {
+     int i, j;
+
+    for (j = 0; j < HEIGHT; j++) {
+        for (i = 0; i < WIDTH; i++) {
+            Cell* cell = get_cell(map, i, j);
+
+            if (cell->type == TREASURE) destroy_treasure(&cell->treasure);
+        }
+    }
     free(map);
 }
 
@@ -230,10 +239,10 @@ static Cell* select_closest_room(Map* map, Cell* cell){
     return closest_cell;
 }
 
-static void set_treasure(Cell* cell){
+static void set_treasure(Cell* cell, int difficulty){
     cell->type = TREASURE;
     cell->treasure.state = CLOSE;
-    init_treasure(&cell->treasure);
+    init_treasure(&cell->treasure, difficulty);
 }
 
 
@@ -258,7 +267,7 @@ static void set_treasures(Map* map, int difficulty, int player_level) {
             continue;
         }
         
-        set_treasure(cell_treasure);
+        set_treasure(cell_treasure, difficulty);
         set_monster(cell_monster, difficulty, exp_given);
     }
 
@@ -270,7 +279,7 @@ static void set_elements(Map* map, int difficulty, int player_level) {
 
     Cell* upstair = get_cell(map, START_X, START_Y);
     Cell* treasure = select_closest_room(map, upstair);
-    set_treasure(treasure);
+    set_treasure(treasure, difficulty);
 }
 
 static int manhattan_distance(int i1, int j1, int i2, int j2) {

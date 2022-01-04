@@ -6,6 +6,7 @@
 #include "Core/Action.h"
 #include "Entity/Player.h"
 #include "Entity/Monster.h"
+#include "Entity/Treasure.h"
 #include "Map/Map.h"
 #include "Interface/graphics.h"
 #include "Interface/raycastingGraphics.h"
@@ -172,24 +173,60 @@ static void get_item_selected(GameStates* gs, int x, int y){
     gs->inventory.index = i + j * 4;
 }
 
+static bool verif_click_item_treasure(int x, int y){
+    int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
+    int start_x = 30 + width_items;
+    int start_y = 30 + width_items;
+
+    int width = width_items * ITEMS_PER_TREASURE;
+    int height = width_items;
+
+    return start_x <= x && start_x + width >= x
+        && start_y <= y && start_y + height >= y;
+}
+
+static void get_item_selected_treasure(GameStates* gs, int x){
+    int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
+    int start_x = 30 + width_items;
+
+    int i = (x - start_x) / width_items;
+    
+    gs->treasure.item_selected = gs->treasure.treasure->items[i];
+    gs->treasure.index = i;
+}
+
 static bool update_action_from_mouse(GameStates* gs, Events* events, Action* action) {
     if (!(events->event == MLV_MOUSE_BUTTON && events->state == MLV_PRESSED)) return false;
     
-    Item* item = gs->inventory.item_selected;
     Player* player = get_player(gs);
 
     if (gs->inventory.is_open) {
+        Item* item = gs->inventory.item_selected;
+
         if(verif_click_item_inventory(events->mouseX, events->mouseY)) get_item_selected(gs, events->mouseX, events->mouseY);
 
-        if (item == NULL) return false;
-
-        if(item->type == POTION && test_click(&gs->inventory.use, events->mouseX, events->mouseY)) {
-            gs->inventory.use.callback(gs);   
-            return true; 
+        if (item != NULL){
+            if(item->type == POTION && test_click(&gs->inventory.use, events->mouseX, events->mouseY)) {
+                gs->inventory.use.callback(gs);   
+                return true; 
+            }
+            else if(!verif_equiped(player, item) && test_click(&gs->inventory.throw, events->mouseX, events->mouseY)) {
+                gs->inventory.throw.callback(gs);   
+                return true; 
+            }
         }
-        else if(!verif_equiped(player, item) && test_click(&gs->inventory.throw, events->mouseX, events->mouseY)) {
-            gs->inventory.throw.callback(gs);   
-            return true; 
+    }
+
+    if (gs->treasure.is_open) {
+        Item* item = gs->treasure.item_selected;
+
+        if(verif_click_item_treasure(events->mouseX, events->mouseY)) get_item_selected_treasure(gs, events->mouseX);
+
+        if (item != NULL) {
+            if(test_click(&gs->treasure.take, events->mouseX, events->mouseY)) {
+                gs->treasure.take.callback(gs);   
+                return true; 
+            }
         }
     }
 
@@ -226,22 +263,32 @@ static bool update_action_from_input(GameStates* gs, Events* events, Action* act
             action->type = USE_STAIR;
             action->cell = cell;
             return true;
+
         case MLV_KEYBOARD_i:
-            gs->inventory.is_open = !gs->inventory.is_open;
+            action->type = TRIGGER_INVENTORY;
             return true;
+
         case MLV_KEYBOARD_c:
             gs->viewType = gs->viewType == DEFAULT ? RAYCASTING : DEFAULT;
             return true;
+
         case MLV_KEYBOARD_t:
             player_cell = get_cell(map, player->position.x, player->position.y);
             cells = find_neighbors(map, player_cell, TREASURE);    
             if (cells->length == 0) break;
 
-            action->type = OPEN_TREASURE;
             action->cell = arrayList_get(cells, 0);
+
+            if (action->cell->treasure.state == CLOSE){
+                action->type = OPEN_TREASURE;
+            }
+            else {
+                action->type = CLOSE_TREASURE;
+            }
 
             arrayList_free(cells, NULL);
             return true;
+
         case MLV_KEYBOARD_a:
             player_cell = get_cell(map, player->position.x, player->position.y);
             cells = find_neighbors(map, player_cell, MONSTER);
@@ -252,12 +299,15 @@ static bool update_action_from_input(GameStates* gs, Events* events, Action* act
 
             arrayList_free(cells, NULL);
             return true;
+
         case MLV_KEYBOARD_p:
             player->attackType = PHYSICAL;
             return true;
+
         case MLV_KEYBOARD_m:
             player->attackType = MAGICAL;
             return true;
+            
         default:
             break;
     }

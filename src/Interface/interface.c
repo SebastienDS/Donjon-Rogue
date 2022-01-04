@@ -8,6 +8,7 @@
 #include"Entity/Inventory/Inventory.h"
 #include "Entity/Inventory/Potions/Potion.h"
 #include "Entity/Inventory/Equipments/Equipment.h"
+#include "Entity/Treasure.h"
 #include "constants.h"
 #include <stdio.h>
 #include "Map/Map.h"
@@ -172,6 +173,7 @@ static void get_type_potion(Player* player, Potion* potion, int i, int j, Invent
     }
 }
 
+
 static void draw_items(GameStates* gs, Inventory_icones* icones){
     int i, j;
     static int start_x = SCREEN_WIDTH * 3 / 5 + 15;
@@ -202,9 +204,75 @@ static void draw_items(GameStates* gs, Inventory_icones* icones){
     }
 }
 
+static void get_type_equipment_treasure(Equipment* equipment, int i, Inventory_icones* icones){
+    int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
+    int start_x = 30 + width_items;
+    int start_y = 30 + width_items;
+
+    switch (equipment->type)
+    {
+    case WEAPON:      
+        MLV_draw_image(icones->sword, start_x + (i * width_items), start_y);
+        break;
+    case ARMOR:
+        MLV_draw_image(icones->armor, start_x + (i * width_items), start_y);
+        break;
+    case MAGICWAND:        
+        MLV_draw_image(icones->magic_wand, start_x + (i * width_items), start_y);
+        break;
+    default:
+        break;
+    }
+}
+
+static void get_type_potion_treasure(Potion* potion, int i, Inventory_icones* icones){
+    int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
+    int start_x = 30 + width_items;
+    int start_y = 30 + width_items;
+
+    switch (potion->type)
+    {
+    case HEALTH:
+    case MAGIC:
+        MLV_draw_image(icones->instant_potion, start_x + (i * width_items), start_y);
+        break;
+    default:
+        MLV_draw_image(icones->potion, start_x + (i * width_items), start_y);
+        break;
+    }
+}
+
+static void draw_items_treasure(GameStates* gs, Inventory_icones* icones){
+    int i;
+    int width_items = (SCREEN_WIDTH * 2 / 5 - 45) / 4;
+    int start_x = 30 + width_items;
+    int start_y = 30 + width_items;
+    Treasure* treasure = gs->treasure.treasure;
+
+    for (i = 0; i < ITEMS_PER_TREASURE; i++){
+        Item* item = treasure->items[i];
+
+        MLV_draw_rectangle(start_x + (i * width_items), start_y, width_items, width_items, MLV_COLOR_BLACK);
+
+        if (item == NULL) continue;
+
+        switch (item->type)
+        {
+            case EQUIPMENT:
+                get_type_equipment_treasure(item->equipment, i, icones);
+                break;
+            case POTION:
+                get_type_potion_treasure(item->potion, i, icones);
+                break;
+            default:
+                break;
+        }        
+    }
+}
 
 
-static void draw_stat_potion(Potion* potion, MLV_Font* font){
+
+static void draw_stat_potion(Potion* potion, MLV_Font* font, int x, int y){
     char str[255];
 
     switch (potion->type)
@@ -228,10 +296,10 @@ static void draw_stat_potion(Potion* potion, MLV_Font* font){
         break;
     }
     /*MLV_draw_text(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 30 - height, str, MLV_COLOR_WHITE_SMOKE);*/
-    MLV_draw_text_box_with_font(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT / 2 - 15, SCREEN_WIDTH * 2 / 5 - 45, 330, str, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box_with_font(x, y, SCREEN_WIDTH * 2 / 5 - 45, 330, str, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
 }
 
-static void draw_stat_equipment(Equipment* equipment, MLV_Font* font){
+static void draw_stat_equipment(Equipment* equipment, MLV_Font* font, int x, int y){
     char str[255];
 
     switch (equipment->type)
@@ -249,7 +317,7 @@ static void draw_stat_equipment(Equipment* equipment, MLV_Font* font){
         break;
     }
     /*MLV_draw_text(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 30 - height, str, MLV_COLOR_WHITE_SMOKE);*/
-    MLV_draw_text_box_with_font(SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT / 2 - 15, SCREEN_WIDTH * 2 / 5 - 45, 330, str, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
+    MLV_draw_text_box_with_font(x, y, SCREEN_WIDTH * 2 / 5 - 45, 330, str, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
 }
 
 
@@ -258,16 +326,33 @@ static void draw_stats(GameStates* gs, Item* item, MLV_Font* font){
     switch (item->type)
     {
     case POTION:
-        draw_stat_potion(item->potion, font);
+        draw_stat_potion(item->potion, font, SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT / 2 - 15);
         break;
     case EQUIPMENT:
-        draw_stat_equipment(item->equipment, font);
+        draw_stat_equipment(item->equipment, font, SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT / 2 - 15);
         break;
     
     default:
         break;
     }
 }
+
+static void draw_stats_treasure(GameStates* gs, Item* item, MLV_Font* font){
+   
+    switch (item->type)
+    {
+    case POTION:
+        draw_stat_potion(item->potion, font, 30, SCREEN_HEIGHT / 2 - 15);
+        break;
+    case EQUIPMENT:
+        draw_stat_equipment(item->equipment, font, 30, SCREEN_HEIGHT / 2 - 15);
+        break;
+    default:
+        break;
+    }
+}
+
+
 
 static void draw_button(Button* button, MLV_Font* font){
     MLV_draw_text_box_with_font(button->x, button->y, button->width, button->height, button->label, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
@@ -291,6 +376,18 @@ static void draw_inventory(GameStates* gs, View* view){
     if (verif_equiped(player, item)) return;
 
     draw_button(&gs->inventory.throw, view->font);
+}
+
+static void draw_treasure(GameStates* gs, View* view){
+    Item* item = gs->treasure.item_selected;
+
+    MLV_draw_filled_rectangle(15, 15, SCREEN_WIDTH * 2 / 5 - 15, SCREEN_HEIGHT - 30, MLV_COLOR_GRAY);
+    draw_items_treasure(gs, &view->inventory_icones);
+
+    if (item == NULL) return;
+
+    draw_stats_treasure(gs, item, view->font);
+    draw_button(&gs->treasure.take, view->font);
 }
 
 static void draw_attack_icon(int x, int y, AttackType type, View* view) {
@@ -338,6 +435,8 @@ void draw_interface(GameStates* gs, View* view) {
     print_actions(gs, view->font);
 
     if (gs->inventory.is_open) draw_inventory(gs, view);
+
+    if (gs->treasure.is_open) draw_treasure(gs, view);
 }
 
 

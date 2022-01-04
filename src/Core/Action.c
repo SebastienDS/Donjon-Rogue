@@ -33,9 +33,29 @@ void apply_action(Action* action, GameStates* gs) {
 
     switch (action->type) {
         case OPEN_TREASURE:
+            gs->treasure.treasure = &action->cell->treasure;
             action->cell->treasure.state = OPEN;
+            gs->treasure.is_open = true;
+
+        case OPEN_INVENTORY:
+            gs->inventory.is_open = true;
             break;
-        
+
+        case CLOSE_TREASURE:
+            destroy_treasure(gs->treasure.treasure);
+            gs->treasure.treasure = NULL;
+            gs->treasure.item_selected = NULL;
+            gs->treasure.is_open = false;
+            action->cell->type = ROOM;
+
+        case CLOSE_INVENTORY:
+            gs->inventory.is_open = false;
+            break;
+
+        case TRIGGER_INVENTORY:
+            gs->inventory.is_open = !gs->inventory.is_open;
+            break;
+
         case FIGHT_MONSTER:
             attack_succeed = attack_monster(get_player(gs), &action->cell->monster);
             if (attack_succeed) {
@@ -47,6 +67,7 @@ void apply_action(Action* action, GameStates* gs) {
                 printf("ATTACK FAILED %d\n", get_player(gs)->mp);
             }
             break;
+
         case USE_STAIR:
             cell = action->cell;
             
@@ -56,6 +77,7 @@ void apply_action(Action* action, GameStates* gs) {
                 go_previous_stage(gs);
             }
             break;
+
         default:
             break;
     }

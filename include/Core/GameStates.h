@@ -31,7 +31,15 @@ typedef struct {
     Button equip;
     Button use;
     Button throw;
-} Inventory_;
+} InventoryInterface;
+
+typedef struct {
+    Item* item_selected;
+    int index;
+    bool is_open;
+    Treasure* treasure;
+    Button take;
+} TreasureInterface;
 
 typedef struct {
     Button atk;
@@ -48,7 +56,8 @@ typedef struct GameStates {
 
     bool end_turn;
 
-    Inventory_ inventory;
+    InventoryInterface inventory;
+    TreasureInterface treasure;
     SkillsUpgrades skills_btn;
 
     LinkedList* path_to_stair; /* LinkedList<PathPosition> */

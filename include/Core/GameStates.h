@@ -14,7 +14,6 @@ typedef enum {
     DEFAULT, RAYCASTING
 } ViewType;
 
-
 typedef struct {
     int x;
     int y;
@@ -38,7 +37,9 @@ typedef struct {
     int index;
     bool is_open;
     Treasure* treasure;
+    Cell* cell;
     Button take;
+    Button close;
 } TreasureInterface;
 
 typedef struct {

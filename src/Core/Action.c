@@ -36,6 +36,7 @@ void apply_action(Action* action, GameStates* gs) {
             gs->treasure.treasure = &action->cell->treasure;
             action->cell->treasure.state = OPEN;
             gs->treasure.is_open = true;
+            gs->treasure.cell = action->cell;
 
         case OPEN_INVENTORY:
             gs->inventory.is_open = true;
@@ -57,7 +58,7 @@ void apply_action(Action* action, GameStates* gs) {
             break;
 
         case FIGHT_MONSTER:
-            attack_succeed = attack_monster(get_player(gs), &action->cell->monster);
+            attack_succeed = attack_monster(get_player(gs), &action->cell->monster, action->attackType);
             if (attack_succeed) {
                 printf("hp : %d \n", action->cell->monster.hp);
                 remove_if_dead(action->cell, get_player(gs));

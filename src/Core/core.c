@@ -44,6 +44,8 @@ static bool update_player_movement(GameStates* gs, Events* events) {
             break;
     }
 
+    if (dx == 0 && dy == 0) return false;
+
     bool moved = try_move(player, map, dx, dy);
 
     if (moved) {
@@ -138,6 +140,7 @@ static bool update_action_from_player_movement(GameStates* gs, Events* events, A
     else if (cell->type == MONSTER) {
         action->type = FIGHT_MONSTER;
         action->cell = cell;
+        action->attackType = PHYSICAL;
         fprintf(stderr, "MONSTER\n");
         return true;
     }
@@ -199,6 +202,7 @@ static bool update_action_from_mouse(GameStates* gs, Events* events, Action* act
     if (!(events->event == MLV_MOUSE_BUTTON && events->state == MLV_PRESSED)) return false;
     
     Player* player = get_player(gs);
+    Map* map = get_current_map(gs);
 
     if (gs->inventory.is_open) {
         Item* item = gs->inventory.item_selected;
@@ -215,35 +219,95 @@ static bool update_action_from_mouse(GameStates* gs, Events* events, Action* act
                 return true; 
             }
         }
+    } 
+    else {
+        Button openInventoryButton;
+        openInventoryButton.x = SCREEN_WIDTH - CELL_SIZE - 15;
+        openInventoryButton.y = SCREEN_HEIGHT - CELL_SIZE - 15;
+        openInventoryButton.width = CELL_SIZE;
+        openInventoryButton.height = CELL_SIZE;
+
+        if (test_click(&openInventoryButton, events->mouseX, events->mouseY)) {
+            gs->inventory.is_open = true;
+            return true;
+        }
     }
 
     if (gs->treasure.is_open) {
         Item* item = gs->treasure.item_selected;
 
-        if(verif_click_item_treasure(events->mouseX, events->mouseY)) get_item_selected_treasure(gs, events->mouseX);
+        if (verif_click_item_treasure(events->mouseX, events->mouseY)) get_item_selected_treasure(gs, events->mouseX);
 
         if (item != NULL) {
-            if(test_click(&gs->treasure.take, events->mouseX, events->mouseY)) {
+            if (test_click(&gs->treasure.take, events->mouseX, events->mouseY)) {
                 gs->treasure.take.callback(gs);   
                 return true; 
             }
         }
-    }
+        if (test_click(&gs->treasure.close, events->mouseX, events->mouseY)) {
+            gs->treasure.close.callback(gs);
+            return true;
+        }
+    } else {
+        if (player->skill_points) {
+            if (test_click(&gs->skills_btn.atk, events->mouseX, events->mouseY)) {
+                gs->skills_btn.atk.callback(gs);   
+                return true; 
+            }
+            else if (test_click(&gs->skills_btn.intel, events->mouseX, events->mouseY)) {
+                gs->skills_btn.intel.callback(gs);   
+                return true; 
+            }
+            else if (test_click(&gs->skills_btn.def, events->mouseX, events->mouseY)) {
+                gs->skills_btn.def.callback(gs);   
+                return true; 
+            }
+        }
 
-    if (player->skill_points) {
-        if (test_click(&gs->skills_btn.atk, events->mouseX, events->mouseY)) {
-            gs->skills_btn.atk.callback(gs);   
-            return true; 
+        Button modeAttackBtn;
+        modeAttackBtn.x = 430;
+        modeAttackBtn.y = 15;
+        modeAttackBtn.width = 50;
+        modeAttackBtn.height = 50;
+
+        if (test_click(&modeAttackBtn, events->mouseX, events->mouseY)) {
+            player->attackType = player->attackType == PHYSICAL ? MAGICAL : PHYSICAL;
+            return true;
         }
-        else if (test_click(&gs->skills_btn.intel, events->mouseX, events->mouseY)) {
-            gs->skills_btn.intel.callback(gs);   
-            return true; 
-        }
-        else if (test_click(&gs->skills_btn.def, events->mouseX, events->mouseY)) {
-            gs->skills_btn.def.callback(gs);   
-            return true; 
+
+        static int width = VISION_X / 2;
+        static int height = VISION_Y / 2;
+
+        int x = events->mouseX / CELL_SIZE;
+        int y = events->mouseY / CELL_SIZE;
+        int dx = x - width;
+        int dy = y - height;
+
+        int dist = abs(dx) + abs(dy);
+        if (dist <= 1) {
+            Cell* cell = get_cell(map, player->position.x + dx, player->position.y + dy);
+
+            switch (cell->type) {
+            case TREASURE:
+                action->type = OPEN_TREASURE;
+                break;
+            case STAIR_DOWN:
+            case STAIR_UP:
+                action->type = USE_STAIR;
+                break;
+            case MONSTER:
+                action->type = FIGHT_MONSTER;
+                action->attackType = player->attackType;
+                break;
+            default:
+                return false;
+            }
+
+            action->cell = cell;
+            return true;
         }
     }
+    
     return false;
 }
 
@@ -256,6 +320,29 @@ static bool update_action_from_input(GameStates* gs, Events* events, Action* act
     Cell* player_cell;
     Cell* cell;
     ArrayList* cells = NULL;
+
+    if (events->key == MLV_KEYBOARD_t) {
+        player_cell = get_cell(map, player->position.x, player->position.y);
+        cells = find_neighbors(map, player_cell, TREASURE);    
+        if (cells->length == 0) {
+            arrayList_free(cells, NULL);
+            return false;
+        }
+
+        action->cell = arrayList_get(cells, 0);
+
+        if (action->cell->treasure.state == CLOSE){
+            action->type = OPEN_TREASURE;
+        }
+        else {
+            action->type = CLOSE_TREASURE;
+        }
+
+        arrayList_free(cells, NULL);
+        return true;
+    }
+
+    if (gs->treasure.is_open) return false;
 
     switch (events->key) {
         case MLV_KEYBOARD_e:
@@ -271,30 +358,14 @@ static bool update_action_from_input(GameStates* gs, Events* events, Action* act
         case MLV_KEYBOARD_c:
             gs->viewType = gs->viewType == DEFAULT ? RAYCASTING : DEFAULT;
             return true;
-
-        case MLV_KEYBOARD_t:
-            player_cell = get_cell(map, player->position.x, player->position.y);
-            cells = find_neighbors(map, player_cell, TREASURE);    
-            if (cells->length == 0) break;
-
-            action->cell = arrayList_get(cells, 0);
-
-            if (action->cell->treasure.state == CLOSE){
-                action->type = OPEN_TREASURE;
-            }
-            else {
-                action->type = CLOSE_TREASURE;
-            }
-
-            arrayList_free(cells, NULL);
-            return true;
-
+            
         case MLV_KEYBOARD_a:
             player_cell = get_cell(map, player->position.x, player->position.y);
             cells = find_neighbors(map, player_cell, MONSTER);
             if (cells->length == 0) break;
 
             action->type = FIGHT_MONSTER;
+            action->attackType = player->attackType;
             action->cell = arrayList_get(cells, 0);
 
             arrayList_free(cells, NULL);
@@ -336,11 +407,14 @@ static void end_turn(GameStates* gs) {
 void update(GameStates* gs, Events* events) {
     Action* action = action_new();
 
-    update_action_from_input(gs, events, action)
-        || gs->viewType == RAYCASTING 
+    if (!gs->treasure.is_open) {
+        gs->viewType == RAYCASTING 
             ? update_player_movement_3d(gs, events)
-            : update_action_from_player_movement(gs, events, action) || update_player_movement(gs, events)
-        || update_action_from_mouse(gs, events, action);
+            : update_action_from_player_movement(gs, events, action) || update_player_movement(gs, events);
+    }
+
+    update_action_from_input(gs, events, action);
+    update_action_from_mouse(gs, events, action);
         
     apply_action(action, gs);
     action_free(action);

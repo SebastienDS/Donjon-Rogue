@@ -34,7 +34,7 @@ static void throw_callback(GameStates* gs){
     player->inventory.items[gs->inventory.index] = NULL;
 }
 
-static void take_callback(GameStates* gs){
+static void take_callback(GameStates* gs) {
     Player* player = get_player(gs);
     int index = get_empty_slot(player);
 
@@ -43,6 +43,16 @@ static void take_callback(GameStates* gs){
     insert_item(player, gs->treasure.item_selected, index);
     gs->treasure.item_selected = NULL;
     gs->treasure.treasure->items[gs->treasure.index] = NULL;
+}
+
+static void close_treasure_callback(GameStates* gs) {
+    destroy_treasure(gs->treasure.treasure);
+    gs->treasure.treasure = NULL;
+    gs->treasure.item_selected = NULL;
+    gs->treasure.is_open = false;
+    gs->inventory.is_open = false;
+
+    gs->treasure.cell->type = ROOM;
 }
 
 static void upgrade_atk_callback(GameStates* gs) {
@@ -95,12 +105,14 @@ void init_game_states(GameStates* gs) {
     gs->treasure.item_selected = NULL;
     gs->treasure.index = 0;
     gs->treasure.treasure = NULL;
+    gs->treasure.cell = NULL;
 
 
     set_button(&gs->inventory.use, SCREEN_WIDTH * 3 / 5 + 15, SCREEN_HEIGHT - 45 - 50, (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "USE", use_callback); 
     set_button(&gs->inventory.throw, SCREEN_WIDTH - ((SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30) - 30, SCREEN_HEIGHT - 45 - 50, (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "THROW", throw_callback);
 
     set_button(&gs->treasure.take, (SCREEN_WIDTH * 2 / 5 - 15 - ((SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30)) / 2, SCREEN_HEIGHT - 45 - 50, (SCREEN_WIDTH * 2 / 5 - 15) / 2 - 30, 50, "TAKE", take_callback);
+    set_button(&gs->treasure.close, SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT * 0.8, 150, 75, "CLOSE", close_treasure_callback);
 
     set_button(&gs->skills_btn.atk, 150, 185, 25, 25, "+", upgrade_atk_callback);
     set_button(&gs->skills_btn.intel, 150, 215, 25, 25, "+", upgrade_intel_callback);

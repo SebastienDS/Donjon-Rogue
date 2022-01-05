@@ -8,7 +8,7 @@ void init_monster(Monster* monster, int difficulty, int exp_given) {
     monster->hp = monster->max_hp;
     monster->atk = 5 + difficulty;
     monster->crit = 5;
-    monster->exp_given = exp_given * 10; 
+    monster->exp_given = exp_given; 
 }
 
 bool is_dead(Monster* monster) {

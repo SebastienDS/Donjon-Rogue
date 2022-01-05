@@ -23,7 +23,8 @@ void equipment_free(Equipment* equipment) {
 
 Equipment* get_random_equipment(int difficulty) {
     int random = randrange(1, 3);  /* WEAPON, ARMOR, MAGICWAND */
-    int quality = MAX(1, randrange(difficulty * 0.5, difficulty * 1.5));
+    int tmp = randrange(difficulty * 0.5, difficulty * 2);
+    int quality = MAX(1, tmp);
 
 
     Equipment* equipment = NULL;

@@ -5,14 +5,20 @@
 #include "Core/GameStates.h"
 
 typedef enum {
-    NONE, OPEN_TREASURE, CLOSE_TREASURE, FIGHT_MONSTER, OPEN_INVENTORY, CLOSE_INVENTORY, TRIGGER_INVENTORY, USE_STAIR
+    NONE, 
+    OPEN_TREASURE, 
+    CLOSE_TREASURE, 
+    FIGHT_MONSTER, 
+    OPEN_INVENTORY, 
+    CLOSE_INVENTORY, 
+    TRIGGER_INVENTORY, 
+    USE_STAIR
 } ActionType;
 
 typedef struct {
     ActionType type;
-    union {
-        Cell* cell;
-    };
+    Cell* cell;
+    AttackType attackType;
 } Action;
 
 /**

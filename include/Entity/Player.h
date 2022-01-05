@@ -123,9 +123,10 @@ void magical_attack(Player* self, Monster* monster);
  * 
  * @param self 
  * @param monster
+ * @param type
  * @return bool
  */
-bool attack_monster(Player* self, Monster* monster);
+bool attack_monster(Player* self, Monster* monster, AttackType type);
 
 /**
  * @brief Effectue une attaque sur le player

@@ -384,6 +384,8 @@ static void draw_treasure(GameStates* gs, View* view){
     MLV_draw_filled_rectangle(15, 15, SCREEN_WIDTH * 2 / 5 - 15, SCREEN_HEIGHT - 30, MLV_COLOR_GRAY);
     draw_items_treasure(gs, &view->inventory_icones);
 
+    draw_button(&gs->treasure.close, view->font);
+
     if (item == NULL) return;
 
     draw_stats_treasure(gs, item, view->font);
@@ -430,12 +432,17 @@ void draw_interface(GameStates* gs, View* view) {
     draw_attack_icon(430, 15, player->attackType, view);
     draw_skills(&gs->skills_btn, 15, 185, player, view->medium_font);
     
-    print_level(player->lvl);
+    if (gs->viewType == DEFAULT) print_level(player->lvl);
+    
     print_floor(gs->current_stage, view->font);
     print_actions(gs, view->font);
 
-    if (gs->inventory.is_open) draw_inventory(gs, view);
-
+    if (gs->inventory.is_open) {
+        draw_inventory(gs, view);
+    }
+    else {
+        MLV_draw_image(view->images.treasure.open, SCREEN_WIDTH - CELL_SIZE - 15, SCREEN_HEIGHT - CELL_SIZE - 15);
+    }
     if (gs->treasure.is_open) draw_treasure(gs, view);
 }
 

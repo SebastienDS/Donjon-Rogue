@@ -46,19 +46,6 @@ void init_player(Player* self, int x, int y) {
     self->skill_points = 0;
 
     init_inventory(&self->inventory);
-    self->inventory.items[0] = get_random_item(1);
-    self->inventory.items[2] = get_random_item(1);
-    self->inventory.items[3] = get_random_item(1);
-    self->inventory.items[4] = get_random_item(1);
-    self->inventory.items[5] = get_random_item(1);
-    self->inventory.items[6] = get_random_item(1);
-    self->inventory.items[7] = get_random_item(1);
-    self->inventory.items[8] = get_random_item(1);
-    self->inventory.items[9] = get_random_item(1);
-    self->inventory.items[10] = get_random_item(1);
-    self->inventory.items[11] = get_random_item(1);
-
-    auto_equip(self);
 }
 
 int get_hp_player(Player* self){
@@ -80,7 +67,7 @@ int get_def(Player* self) {
 }
 
 int get_intel(Player* self) {
-    int bonus = self->bonus.weapon == NULL ? 0 : self->bonus.magic_wand->magic_wand.quality; 
+    int bonus = self->bonus.magic_wand == NULL ? 0 : self->bonus.magic_wand->magic_wand.quality; 
     return self->intel + bonus;
 }
 
@@ -113,8 +100,8 @@ void magical_attack(Player* self, Monster* monster){
     printf("MAGICAL\n");
 }
 
-bool attack_monster(Player* self, Monster* monster) {
-    switch (self->attackType) {
+bool attack_monster(Player* self, Monster* monster, AttackType attackType) {
+    switch (attackType) {
     case PHYSICAL:
         physical_attack(self, monster);
         return true;
@@ -304,5 +291,6 @@ bool insert_item(Player* player, Item* item, int index){
     if (player->inventory.items[index] != NULL) return false;
 
     player->inventory.items[index] = item;
+    auto_equip(player);
     return true;
 }

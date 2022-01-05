@@ -25,7 +25,7 @@ Map* map_new(int level, int player_level) {
     }
 
     init_map(map);
-    generate_stage(map, level, player_level);
+    generate_stage(map, level + 1, player_level);
 
     return map;
 }

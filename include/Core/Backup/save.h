@@ -11,14 +11,5 @@
  */
 void save_gamestates(GameStates* gs, char* path);
 
-/**
- * @brief Charge la partie à partir d'un fichier 
- * 
- * @param path 
- * @return GameStates* 
- */
-GameStates* load_gamestates(char* path);
-
-
 
 #endif

@@ -1,25 +1,31 @@
-#include "Core/save.h"
+#include "Core/Backup/save.h"
 #include "Core/GameStates.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 
+static void write(FILE* f, int value) {
+    fwrite(&value, sizeof(int), 1, f);
+}
+
 static void save_equipment(Equipment* equipment, FILE* file){
     if (equipment == NULL) {
-        fprintf(file, "-1;");
+        write(file, -1);
         return;
     }
+
+    write(file, equipment->type);
 
     switch (equipment->type)
     {
     case ARMOR:
-        fprintf(file, "%d;%d;", equipment->type, equipment->armor.quality);
+        write(file, equipment->armor.quality);
         break;
     case MAGICWAND:
-        fprintf(file, "%d;%d;", equipment->type, equipment->magic_wand.quality);
+        write(file, equipment->magic_wand.quality);
         break;
     case WEAPON:
-        fprintf(file, "%d;%d;", equipment->type, equipment->weapon.quality);
+        write(file, equipment->weapon.quality);
         break;
 
     default:
@@ -29,26 +35,34 @@ static void save_equipment(Equipment* equipment, FILE* file){
 
 static void save_potion(Potion* potion, FILE* file){
     if (potion == NULL) {
-        fprintf(file, "-1;");
+        write(file, -1);
         return;
     }
+
+    write(file, potion->type);
 
     switch (potion->type)
     {
     case ACCURACY:
-        fprintf(file, "%d;%d;", potion->accuracy.crit, potion->accuracy.duration);
+        write(file, potion->accuracy.crit);
+        write(file, potion->accuracy.duration);
         break;
     case EXPERIENCE:
-        fprintf(file, "%d;%d;", potion->experience.exp, potion->experience.duration);
+        write(file, potion->experience.exp);
+        write(file, potion->experience.duration);
         break;
     case HEALTH:
-        fprintf(file, "%d;", potion->health.hp);
+        write(file, potion->health.hp);
         break;
     case MAGIC:
-        fprintf(file, "%d;", potion->magic.mp);
+        write(file, potion->magic.mp);
         break;
     case REGENERATION:
-        fprintf(file, "%d;%d;%d;%d;%d;", potion->regeneration.hp, potion->regeneration.mp, potion->regeneration.duration, potion->regeneration.interval, potion->regeneration.countdown);
+        write(file, potion->regeneration.hp);
+        write(file, potion->regeneration.mp);
+        write(file, potion->regeneration.duration);
+        write(file, potion->regeneration.interval);
+        write(file, potion->regeneration.countdown);
         break;
 
     default:
@@ -58,9 +72,11 @@ static void save_potion(Potion* potion, FILE* file){
 
 static void save_item(Item* item, FILE* file){
     if (item == NULL) {
-        fprintf(file, "-1;");
+        write(file, -1);
         return;
     }
+        
+    write(file, item->type);
 
     switch (item->type)
     {
@@ -93,30 +109,30 @@ static void save_bonus(Bonus* bonus, FILE* file){
 }
 
 static void save_player(Player* player, FILE* file){
-    fprintf(file, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%f;%f;", 
-        player->hp,
-        player->mp,
-        player->atk,
-        player->intel,
-        player->def,
-        player->exp,
-        player->lvl,
-        player->crit,
-        player->skill_points,
-        player->position.x,
-        player->position.y);
+    write(file, player->hp);
+    write(file, player->mp);
+    write(file, player->atk);
+    write(file, player->intel);
+    write(file, player->def);
+    write(file, player->exp);
+    write(file, player->lvl);
+    write(file, player->crit);
+    write(file, player->skill_points);
+
+    fwrite(&player->position.x, sizeof(double), 1, file);
+    fwrite(&player->position.y, sizeof(double), 1, file);
+
     
     save_inventory(&player->inventory, file);
     save_bonus(&player->bonus, file);
 }
 
 static void save_monster(Monster* monster, FILE* file){
-    fprintf(file, "%d;%d;%d;%d;%d;", 
-        monster->max_hp, 
-        monster->hp,   
-        monster->atk, 
-        monster->crit,
-        monster->exp_given);
+    write(file, monster->max_hp);
+    write(file, monster->hp);
+    write(file, monster->atk);
+    write(file, monster->crit);
+    write(file, monster->exp_given);
 }
 
 static void save_treasure(Treasure* treasure, FILE* file){
@@ -137,21 +153,21 @@ static void save_map(Map* map, FILE* file){
             switch (cell->type)
             {
             case MONSTER:
-                fprintf(file, "%d;", cell->type);
+                write(file, cell->type);
                 save_monster(&cell->monster, file);
                 break;
             case TREASURE:
                 if (cell->treasure.state == CLOSE) {
-                    fprintf(file, "%d;", cell->type);
+                    write(file, cell->type);
                     save_treasure(&cell->treasure, file);
                 }
                 else {
-                    fprintf(file, "%d;", ROOM);
+                    write(file, ROOM);
                 }
                 break;
             
             default:
-                fprintf(file, "%d;", cell->type);
+                write(file, cell->type);
                 break;
             }
         }
@@ -161,32 +177,26 @@ static void save_map(Map* map, FILE* file){
 static void save_maps(ArrayList* maps, FILE* file){
     int i;
 
-    fprintf(file, "%d;", maps->length);
+    write(file, maps->length);
+
     for (i = 0; i < maps->length; i++){
         save_map(arrayList_get(maps, i), file);
     }
 }
 
 void save_gamestates(GameStates* gs, char* path){
-    FILE *fic = fopen(path, "wb");
+    FILE *file = fopen(path, "wb");
 
-    if (fic == NULL){
+    if (file == NULL){
         perror("Save error !");
         exit(1);
     }
 
     Player* player = get_player(gs);
 
-    save_player(player, fic);
-    fprintf(fic, "%d;", gs->current_stage);
-    save_maps(gs->maps, fic);
+    save_player(player, file);
+    write(file, gs->current_stage);
+    save_maps(gs->maps, file);
 
-    fclose(fic);
-}
-
-
-
-
-GameStates* load_gamestates(char* path){
-    return NULL;
+    fclose(file);
 }

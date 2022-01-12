@@ -24,4 +24,15 @@ void update(GameStates* gs, Events* events);
  */
 void draw(GameStates* gs, View* view);
 
+/**
+ * @brief test si on clique sur le bouton
+ * 
+ * @param button 
+ * @param x 
+ * @param y 
+ * @return true 
+ * @return false 
+ */
+bool test_click(Button* button, int x, int y);
+
 #endif

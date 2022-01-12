@@ -17,7 +17,7 @@ Cell* get_cell(Map* map, int x, int y) {
     return &map->map[y][x];
 }
 
-Map* map_new(int level, int player_level) {
+Map* map_new() {
     Map* map = (Map*)malloc(sizeof(Map));
     if (map == NULL) {
         fprintf(stderr, "Map malloc error\n");
@@ -25,7 +25,6 @@ Map* map_new(int level, int player_level) {
     }
 
     init_map(map);
-    generate_stage(map, level + 1, player_level);
 
     return map;
 }
@@ -61,7 +60,7 @@ bool is_on_the_grid(int x, int y) {
     return x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT;
 }
 
-static int compute_neighbors(Map* map, Cell* cell, const int neighbors[][2], int length, Celltype type) {
+int compute_neighbors(Map* map, Cell* cell, const int neighbors[][2], int length, Celltype type) {
     int i, pos_x, pos_y;
     int cpt = 0;
     
@@ -351,4 +350,19 @@ ArrayList* find_neighbors(Map* map, Cell* cell, Celltype type) {
     }
 
     return list;
+}
+
+void update_stair_down(Map* map) {
+    int i, j;
+
+    for (j = 0; j < HEIGHT; j++) {
+        for (i = 0; i < WIDTH; i++) {
+            Cell* cell = get_cell(map, i, j);
+
+            if (cell->type == STAIR_DOWN) {
+                map->stair_down = cell;
+                return;
+            }
+        }
+    }
 }

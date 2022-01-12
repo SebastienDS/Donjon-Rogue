@@ -79,7 +79,7 @@ static bool is_walkable_func(Element* grid, int i, int j) {
     return cell->type != WALL;
 }
 
-static void set_button(Button* button, int x, int y, int width, int height, char label[50], void(*callback)(GameStates* gs)){
+void set_button(Button* button, int x, int y, int width, int height, char label[50], void(*callback)(GameStates* gs)) {
     button->x = x;
     button->y = y;
     button->width = width;
@@ -121,7 +121,8 @@ void init_game_states(GameStates* gs) {
     Player* p = get_player(gs);
     init_player(p, START_X, START_Y);
 
-    Map* map = map_new(gs->current_stage, p->lvl);
+    Map* map = map_new();
+    generate_stage(map, gs->current_stage + 1, p->lvl);
     arrayList_add(gs->maps, map);
 
 
@@ -167,34 +168,20 @@ static void set_player_position(GameStates* gs, Celltype cell_type) {
     }
 }
 
-static void update_stair(Map* map) {
-    int i, j;
-
-    for (j = 0; j < HEIGHT; j++) {
-        for (i = 0; i < WIDTH; i++) {
-            Cell* cell = get_cell(map, i, j);
-
-            if (cell->type == STAIR_DOWN) {
-                map->stair_down = cell;
-                return;
-            }
-        }
-    }
-}
-
 void go_next_stage(GameStates* gs) {
     gs->current_stage++;
 
     if (gs->current_stage > gs->maps->length - 1) {
         Player* p = get_player(gs);
-        Map* map = map_new(gs->current_stage, p->lvl);
+        Map* map = map_new();
+        generate_stage(map, gs->current_stage + 1, p->lvl);
         arrayList_add(gs->maps, map);
     }
 
     set_player_position(gs, STAIR_UP);
     
     #if DEBUG
-        update_stair(get_current_map(gs));
+        update_stair_down(get_current_map(gs));
         update_path_to_stair(gs);
     #endif
 }
@@ -207,7 +194,7 @@ void go_previous_stage(GameStates* gs) {
     set_player_position(gs, STAIR_DOWN);
 
     #if DEBUG
-        update_stair(get_current_map(gs));
+        update_stair_down(get_current_map(gs));
         update_path_to_stair(gs);
     #endif
 }

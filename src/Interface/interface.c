@@ -46,34 +46,6 @@ static void print_level(int level) {
     MLV_draw_text((SCREEN_WIDTH - width) / 2, (SCREEN_HEIGHT - CELL_SIZE - height) / 2 - 10, str, MLV_COLOR_WHITE_SMOKE);
 }
 
-static void get_possible_action(GameStates* gs, ArrayList* list) {
-    static const int neighbors_dist1[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
-
-    Player* player = get_player(gs);
-    Map* map = get_current_map(gs);
-
-    int coord_x = player->position.x;
-    int coord_y = player->position.y;
-    int i, pos_x, pos_y;
-
-    Cell* cell = get_cell(map, coord_x, coord_y);
-
-    if (cell->type == STAIR_DOWN || (cell->type == STAIR_UP && gs->current_stage != 0)){
-        arrayList_add(list, cell);
-    }
-
-    for (i = 0; i < 4; i++) {
-        pos_x = neighbors_dist1[i][0] + coord_x;
-        pos_y = neighbors_dist1[i][1] + coord_y;
-
-        Cell* cell = get_cell(map, pos_x, pos_y);
-
-        if ((cell->type == TREASURE && cell->treasure.state == CLOSE) || cell->type == MONSTER){
-            arrayList_add(list, cell);
-        }
-    }
-}
-
 static void print_instruction(char key, char* text, MLV_Font* font, int y){
     char str[50];
     int width, height;
@@ -85,41 +57,30 @@ static void print_instruction(char key, char* text, MLV_Font* font, int y){
 
 
 void print_actions(GameStates* gs, MLV_Font* font){
-    ArrayList* list = arrayList_new();
-    int i, cpt = 0;
+    static const int neighbors[5][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {0, 0}};
 
-    get_possible_action(gs, list);
+    Map* map = get_current_map(gs);
+    Player* player = get_player(gs);
+    int cpt = 0;
 
-    for (i = 0; i < list->length; i++) {
-        Cell* cell = arrayList_get(list, i);
+    Cell* cell = get_cell(map, player->position.x, player->position.y);
 
-        switch (cell->type)
-        {
-            case STAIR_UP:
-            case STAIR_DOWN:
-                print_instruction('E', "Use stair", font, cpt);
-                cpt++;
-                break;
-
-            case TREASURE:  
-                print_instruction('T', "Open treasure", font, cpt);
-                cpt++;
-                break;
-                
-            case MONSTER:
-                print_instruction('P', "Set physical attack", font, cpt);
-                cpt++;
-                print_instruction('M', "Set magical attack", font, cpt);
-                cpt++;
-                print_instruction('A', "Attack monster", font, cpt);
-                cpt++;
-                break;
-            
-            default:
-                break;
-        }
+    if (compute_neighbors(map, cell, neighbors, 5, STAIR_DOWN) || compute_neighbors(map, cell, neighbors, 5, STAIR_UP)) {
+        print_instruction('E', "Use stair", font, cpt);
+        cpt++;
     }
-    arrayList_free(list, NULL);
+    if (compute_neighbors(map, cell, neighbors, 5, TREASURE)) {
+        print_instruction('T', "Open treasure", font, cpt);
+        cpt++;
+    }
+    if (compute_neighbors(map, cell, neighbors, 5, MONSTER)) {
+        print_instruction('P', "Set physical attack", font, cpt);
+        cpt++;
+        print_instruction('M', "Set magical attack", font, cpt);
+        cpt++;
+        print_instruction('A', "Attack monster", font, cpt);
+        cpt++;
+    }
 }
 
 static void get_type_equipment(Player* player, Equipment* equipment, int i, int j, Inventory_icones* icones){
@@ -270,8 +231,6 @@ static void draw_items_treasure(GameStates* gs, Inventory_icones* icones){
     }
 }
 
-
-
 static void draw_stat_potion(Potion* potion, MLV_Font* font, int x, int y){
     char str[255];
 
@@ -354,9 +313,8 @@ static void draw_stats_treasure(GameStates* gs, Item* item, MLV_Font* font){
 
 
 
-static void draw_button(Button* button, MLV_Font* font){
+void draw_button(Button* button, MLV_Font* font) {
     MLV_draw_text_box_with_font(button->x, button->y, button->width, button->height, button->label, font, 15, MLV_COLOR_GRAY2, MLV_COLOR_BLACK, MLV_COLOR_GRAY, MLV_TEXT_LEFT, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
-
 }
 
 static void draw_inventory(GameStates* gs, View* view){

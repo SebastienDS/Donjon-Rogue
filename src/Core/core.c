@@ -147,7 +147,7 @@ static bool update_action_from_player_movement(GameStates* gs, Events* events, A
     return false;
 }
 
-static bool test_click(Button* button, int x, int y){
+bool test_click(Button* button, int x, int y) {
     return button->x <= x && button->x + button->width >= x 
         && button->y <= y && button->y + button->height >= y;
 }

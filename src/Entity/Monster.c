@@ -11,6 +11,6 @@ void init_monster(Monster* monster, int difficulty, int exp_given) {
     monster->exp_given = exp_given; 
 }
 
-bool is_dead(Monster* monster) {
+bool is_monster_dead(Monster* monster) {
     return monster->hp <= 0;
 }

@@ -115,5 +115,17 @@ void go_previous_stage(GameStates* gs);
  */
 void update_path_to_stair(GameStates* gs);
 
+/**
+ * @brief Set the button object
+ * 
+ * @param button 
+ * @param x 
+ * @param y 
+ * @param width 
+ * @param height 
+ * @param label 
+ * @param callback 
+ */
+void set_button(Button* button, int x, int y, int width, int height, char label[50], void(*callback)(GameStates* gs));
 
 #endif

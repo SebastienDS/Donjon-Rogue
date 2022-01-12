@@ -78,6 +78,19 @@ bool is_on_the_grid(int x, int y);
 bool is_at_the_border(int x, int y);
 
 /**
+ * @brief Renvoie le nombre de voisin du type recherché
+ * 
+ * @param map 
+ * @param cell 
+ * @param neighbors 
+ * @param length 
+ * @param type 
+ * @return int 
+ */
+int compute_neighbors(Map* map, Cell* cell, const int neighbors[][2], int length, Celltype type);
+
+
+/**
  * @brief Génère un étage aléatoire 
  * 
  * @param map 
@@ -107,6 +120,12 @@ bool is_walkable(Map* map, int x, int y);
  */
 ArrayList* find_neighbors(Map* map, Cell* cell, Celltype type);
 
+/**
+ * @brief Met à jour la position de l'escalier descendant
+ * 
+ * @param map 
+ */
+void update_stair_down(Map* map);
 
 
 #endif

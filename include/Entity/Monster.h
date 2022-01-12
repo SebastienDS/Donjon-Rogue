@@ -25,7 +25,7 @@ void init_monster(Monster* monster, int difficulty, int exp_given);
  * @return true 
  * @return false 
  */
-bool is_dead(Monster* monster);
+bool is_monster_dead(Monster* monster);
 
 
 #endif

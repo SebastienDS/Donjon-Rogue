@@ -21,7 +21,7 @@ Action* action_new(void){
 }
 
 static void remove_if_dead(Cell* cell, Player* player){
-    if (is_dead(&cell->monster)){
+    if (is_monster_dead(&cell->monster)){
         gain_experience(player, cell->monster.exp_given);
         cell->type = ROOM;
     }

@@ -28,6 +28,14 @@ void draw_interface(GameStates* gs, View* view);
 void draw_bar(int pos_x, int pos_y, int size_x, int size_y, MLV_Color color, int value, int max);
 
 /**
+ * @brief Affiche un bouton
+ * 
+ * @param button 
+ * @param font 
+ */
+void draw_button(Button* button, MLV_Font* font);
+
+/**
  * @brief Affiche le numéro de l'étage dans lequel se trouve le joueur
  * 
  * @param floor 

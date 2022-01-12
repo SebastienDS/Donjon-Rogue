@@ -215,6 +215,14 @@ int get_empty_slot(Player* player);
  */
 bool insert_item(Player* player, Item* item, int index);
 
+/**
+ * @brief Renvoie si le joueur est mort
+ * 
+ * @param player 
+ * @return true 
+ * @return false 
+ */
+bool is_player_dead(Player* player);
 
 
 #endif

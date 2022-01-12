@@ -294,3 +294,7 @@ bool insert_item(Player* player, Item* item, int index){
     auto_equip(player);
     return true;
 }
+
+bool is_player_dead(Player* player) {
+    return player->hp <= 0;
+} 

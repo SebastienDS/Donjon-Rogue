@@ -7,6 +7,8 @@
 #include "Entity/Player.h"
 #include <stdbool.h>
 
+#define LOG_COUNT 5
+
 typedef struct GameStates GameStates;
 
 
@@ -60,6 +62,8 @@ typedef struct GameStates {
     InventoryInterface inventory;
     TreasureInterface treasure;
     SkillsUpgrades skills_btn;
+
+    char* logs[LOG_COUNT];
 
     LinkedList* path_to_stair; /* LinkedList<PathPosition> */
 } GameStates;
@@ -127,5 +131,13 @@ void update_path_to_stair(GameStates* gs);
  * @param callback 
  */
 void set_button(Button* button, int x, int y, int width, int height, char label[50], void(*callback)(GameStates* gs));
+
+/**
+ * @brief Log un evenement de la partie
+ * 
+ * @param gs 
+ * @param log 
+ */
+void log_event(GameStates* gs, char* log);
 
 #endif

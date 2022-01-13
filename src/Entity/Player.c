@@ -79,6 +79,9 @@ int get_crit(Player* self) {
 static void attack(Player* self, Monster* monster, int dmg){
     int crit = get_crit(self);
     int random = randrange(0, 100);
+    int damage_fluctuation = randrange(80, 120);
+
+    dmg *= damage_fluctuation / 100.0;
 
     if (random <= crit){
         dmg *= CRIT_MULTIPLICATOR;
@@ -89,7 +92,6 @@ static void attack(Player* self, Monster* monster, int dmg){
 
 void physical_attack(Player* self, Monster* monster){
     attack(self, monster, get_atk(self));
-    printf("PHYSICAL\n");
 }
 
 void magical_attack(Player* self, Monster* monster){
@@ -97,7 +99,6 @@ void magical_attack(Player* self, Monster* monster){
 
     attack(self, monster, 2 * get_intel(self));
     self->mp -= 20;
-    printf("MAGICAL\n");
 }
 
 bool attack_monster(Player* self, Monster* monster, AttackType attackType) {
@@ -273,7 +274,6 @@ void gain_experience(Player* player, int exp) {
 
     player->exp += exp + exp * bonus / 100.0;
     verif_level_up(player);
-    printf("Exp: %d lvl: %d \n", player->exp, player->lvl);
 }
 
 int get_empty_slot(Player* player){

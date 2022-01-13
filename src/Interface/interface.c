@@ -377,6 +377,21 @@ static void draw_skills(SkillsUpgrades* btns, int x, int y, Player* player, MLV_
 
 }
 
+static void print_log(char* text, MLV_Font* font, int y) {
+    int width, height;
+
+    MLV_get_size_of_text_with_font(text, &width, &height, font);
+    MLV_draw_text_with_font(SCREEN_WIDTH - width - 15, SCREEN_HEIGHT - 200 - y * height, text, font, MLV_COLOR_WHITE_SMOKE);
+}
+
+
+void print_logs(GameStates* gs, MLV_Font* font) {
+    int i;
+    for (i = 0; i < LOG_COUNT; i++) {
+        if (gs->logs[i] == NULL) continue;
+        print_log(gs->logs[i], font, i);
+    }
+}
 
 void draw_interface(GameStates* gs, View* view) {
     Player* player = get_player(gs);
@@ -394,6 +409,8 @@ void draw_interface(GameStates* gs, View* view) {
     
     print_floor(gs->current_stage, view->font);
     print_actions(gs, view->font);
+    print_logs(gs, view->medium_font);
+
 
     if (gs->inventory.is_open) {
         draw_inventory(gs, view);

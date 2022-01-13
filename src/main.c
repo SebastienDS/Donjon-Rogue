@@ -20,6 +20,7 @@ typedef struct {
     GameStates* gs;
     bool exit;
     bool in_game;
+    bool game_started;
 } Data;
 
 void exit_function(void* data){
@@ -71,6 +72,8 @@ void game(GameStates* gs, View* view, Data* data, bool new_game) {
     } else {
         load_gamestates(SAVE_PATH, gs);
     }
+
+    data->game_started = true;
 
     Events events;
     Player* player = get_player(gs);
@@ -143,8 +146,7 @@ void gameloop(GameStates* gs, View* view, Data* data) {
 }
 
 int main(void) {
-    /* srand(time(NULL)); */
-    srand(2);
+    srand(time(NULL));
 
     GameStates gs;
     View view;
@@ -153,6 +155,8 @@ int main(void) {
     data.gs = &gs;
     data.in_game = false;
     data.exit = false;
+    data.game_started = false;
+
 
     MLV_execute_at_exit( exit_function, &data);
 
@@ -163,7 +167,10 @@ int main(void) {
     gameloop(&gs, &view, &data);
 
     destroy_view(&view);
-    destroy_game_states(&gs);
+
+    if (data.game_started) {
+        destroy_game_states(&gs);
+    }
 
     MLV_free_window();
 

@@ -125,6 +125,10 @@ void init_game_states(GameStates* gs) {
     generate_stage(map, gs->current_stage + 1, p->lvl);
     arrayList_add(gs->maps, map);
 
+    int i;
+    for (i = 0; i < LOG_COUNT; i++) {
+        gs->logs[i] = NULL;
+    }
 
     #if DEBUG
         update_path_to_stair(gs);
@@ -209,4 +213,19 @@ void update_path_to_stair(GameStates* gs) {
     PathPosition* end = path_position_new(map->stair_down->x, map->stair_down->y);
 
     gs->path_to_stair = astar(map, start, end, is_walkable_func, WIDTH, HEIGHT);
+}
+
+void swap_str(char** str1, char** str2) {
+    char* temp = *str1;
+    *str1 = *str2;
+    *str2 = temp;
+}  
+
+void log_event(GameStates* gs, char* log) {
+    swap_str(&log, &gs->logs[0]);
+
+    int i;
+    for (i = 0; i < LOG_COUNT - 1; i++) {
+        swap_str(&gs->logs[i], &gs->logs[i + 1]);
+    }
 }

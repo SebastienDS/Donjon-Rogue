@@ -8,7 +8,7 @@ OBJ_DIR = ${OUT_DIR}/obj
 EXE = ${OUT_DIR}/main
 ARGS = 
 
-CFLAGS = -I ${HEADERS_DIR} -ansi -Wall -Wfatal-errors -g -lMLV -lm
+CFLAGS = -I ${HEADERS_DIR} -ansi -Wall -Wfatal-errors -g -lm
 
 SRC = $(shell find ${SRC_DIR} -name \*.c)
 OBJ = $(patsubst ${SRC_DIR}/%.c, ${OBJ_DIR}/%.o, ${SRC})
@@ -21,7 +21,13 @@ run: all
 	./${EXE} ${ARGS}
 
 ${EXE}: ${OBJ}
-	gcc $^ -o $@ ${CFLAGS}
+	gcc $^ -o $@ ${CFLAGS} -lMLV
+
+${OBJ_DIR}/Interface/%.o: ${SRC_DIR}/Interface/%.c
+	gcc -MMD -MP -c $< -o $@ ${CFLAGS} -lMLV
+
+${OBJ_DIR}/main.o: ${SRC_DIR}/main.c
+	gcc -MMD -MP -c $< -o $@ ${CFLAGS} -lMLV
 
 ${OBJ_DIR}/%.o: ${SRC_DIR}/%.c
 	gcc -MMD -MP -c $< -o $@ ${CFLAGS}

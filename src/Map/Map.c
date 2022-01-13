@@ -306,7 +306,6 @@ static void set_stair_down(Map* map, Cell* stair_up) {
     map->stair_down = stair_down;
 
     stair_down->type = STAIR_DOWN;
-    printf("%d %d\n", stair_down->x, stair_down->y);
 
     arrayList_free(list, NULL);
 }

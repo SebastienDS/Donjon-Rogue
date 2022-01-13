@@ -134,14 +134,12 @@ static bool update_action_from_player_movement(GameStates* gs, Events* events, A
     if (cell->type == TREASURE && cell->treasure.state == CLOSE) {
         action->type = OPEN_TREASURE;
         action->cell = cell;
-        fprintf(stderr, "TREASURE\n");
         return true;
     }
     else if (cell->type == MONSTER) {
         action->type = FIGHT_MONSTER;
         action->cell = cell;
         action->attackType = PHYSICAL;
-        fprintf(stderr, "MONSTER\n");
         return true;
     }
     return false;
@@ -373,10 +371,12 @@ static bool update_action_from_input(GameStates* gs, Events* events, Action* act
 
         case MLV_KEYBOARD_p:
             player->attackType = PHYSICAL;
+            log_event(gs, "Mode: Physical");
             return true;
 
         case MLV_KEYBOARD_m:
             player->attackType = MAGICAL;
+            log_event(gs, "Mode: Magical");
             return true;
             
         default:

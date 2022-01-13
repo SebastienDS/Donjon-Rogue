@@ -37,6 +37,7 @@ void apply_action(Action* action, GameStates* gs) {
             action->cell->treasure.state = OPEN;
             gs->treasure.is_open = true;
             gs->treasure.cell = action->cell;
+            log_event(gs, "Open Treasure");
 
         case OPEN_INVENTORY:
             gs->inventory.is_open = true;
@@ -60,12 +61,12 @@ void apply_action(Action* action, GameStates* gs) {
         case FIGHT_MONSTER:
             attack_succeed = attack_monster(get_player(gs), &action->cell->monster, action->attackType);
             if (attack_succeed) {
-                printf("hp : %d \n", action->cell->monster.hp);
                 remove_if_dead(action->cell, get_player(gs));
+                log_event(gs, "Fight Monster");
                 
                 gs->end_turn = true;
             } else {
-                printf("ATTACK FAILED %d\n", get_player(gs)->mp);
+                log_event(gs, "Attack Failed: Not enought mana");
             }
             break;
 
@@ -77,6 +78,8 @@ void apply_action(Action* action, GameStates* gs) {
             } else if (cell->type == STAIR_UP) {
                 go_previous_stage(gs);
             }
+
+            log_event(gs, "Use Stair");
             break;
 
         default:
